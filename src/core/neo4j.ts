@@ -14,7 +14,7 @@ export async function verifyConnectivity() {
 	return driver.verifyConnectivity()
 }
 
-export function close() {
+export function closeDBConnection() {
 	db.close()
 	driver.close()
 }

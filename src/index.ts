@@ -1,6 +1,7 @@
 import { Node, ts } from "ts-morph"
 
 import { readFileSync } from "fs"
+import { closeDBConnection } from "./core/neo4j"
 import { ingestData, insertDataIntoDB } from "./data"
 import { DBNode, makeDBNode } from "./node"
 import { processCodebase } from "./project"
@@ -40,7 +41,7 @@ async function makeNode(node: Node<ts.Node>) {
 async function main() {
 	// return await ingest()
 
-	await insertDataIntoDB(JSON.parse(readFileSync("data.json", "utf-8")))
+	await insertDataIntoDB(JSON.parse(readFileSync("data.json", "utf-8"))).then(
+		() => closeDBConnection()
+	)
 }
-
-main()
