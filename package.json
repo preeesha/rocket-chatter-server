@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "(cls | clear) && ts-node ./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.27",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "@types/cli-progress": "^3.11.5",
+    "cli-progress": "^3.12.0",
+    "fs-extra": "^10.0.0",
+    "neo4j-driver": "4.4.0",
+    "ts-morph": "9.1.0"
+  }
+}
