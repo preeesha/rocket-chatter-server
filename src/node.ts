@@ -47,7 +47,7 @@ export async function insertDBNode(
 		relation: string
 		type: "in" | "out"
 	}[]
-) {
+): Promise<any> {
 	let query = ""
 	query += relations
 		.map((x, i) => {
@@ -70,15 +70,17 @@ export async function insertDBNode(
 	query += relations
 		.map((x, i) => `\nCREATE (n)-[:${x.relation}]->(${"m" + i})`)
 		.join("")
-	// console.log(query)
 
-	await tx.run(query, node)
-
+	const jobs = []
+	jobs.push(tx.run(query, node).catch(() => console.error(query)))
 	for (const child of node.children) {
-		await insertDBNode(tx, child, [
-			{ relation: "LOCAL_OF", with: node, type: "out" },
-		])
+		jobs.push(
+			insertDBNode(tx, child, [
+				{ relation: "LOCAL_OF", with: node, type: "out" },
+			])
+		)
 	}
+	return Promise.all(jobs)
 }
 
 export function makeDBNode(node: Node<ts.Node>): DBNode {

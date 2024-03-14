@@ -12,7 +12,13 @@ export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
 
 	const nodes = Object.values(data).flat(6)
 	const progressBar = new cliProgress.Bar(
-		{ etaBuffer: 1 },
+		{
+			etaBuffer: 1,
+			forceRedraw: true,
+			fps: 60,
+			format:
+				"Inserting nodes [{bar}] {percentage}% | {value}/{total} | {duration}s",
+		},
 		cliProgress.Presets.legacy
 	)
 	progressBar.start(nodes.length + 1, 0)
@@ -23,7 +29,6 @@ export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
 	progressBar.increment()
 
 	const jobs = []
-
 	for (const nodes of Object.values(data)) {
 		const fileNode: DBNode = {
 			name: "File",
@@ -44,7 +49,6 @@ export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
 			)
 		}
 	}
-
 	await Promise.all(jobs)
 
 	progressBar.stop()
