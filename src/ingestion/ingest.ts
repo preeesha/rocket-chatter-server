@@ -1,25 +1,83 @@
 import { writeFileSync } from "fs"
-import { Node, ts } from "ts-morph"
+import { Node, Project, ts } from "ts-morph"
 import { DBNode } from "../database/node.types"
-import { makeDBNode } from "./node"
-import { processCodebase } from "./project"
+import { generateNodeID, makeDBNode } from "./node"
 
-let records: Record<string, DBNode[]> = {}
+const nodes: Record<string, DBNode> = {}
 
-async function makeNode(node: Node<ts.Node>) {
-	const n = makeDBNode(node)
-	if (!records[n.filePath]) {
-		records[n.filePath] = []
+function writeJSON(file: string, data: any) {
+	writeFileSync(`${file}.data.json`, JSON.stringify(data, null, 2))
+}
+
+function findCallerFunction(
+	node: Node
+): Node<ts.FunctionDeclaration> | undefined {
+	const parent = node.getParent()
+	if (!parent) {
+		return undefined // Reached the top of the file
 	}
-	records[n.filePath].push(n)
 
-	for (const local of node.getLocals()) {
-		const ln = makeDBNode(local.getDeclarations()[0])
-		n.children.push(ln)
+	if (
+		parent.getKind() === ts.SyntaxKind.FunctionDeclaration ||
+		parent.getKind() === ts.SyntaxKind.ArrowFunction ||
+		parent.getKind() === ts.SyntaxKind.SourceFile
+	) {
+		return parent as Node<ts.FunctionDeclaration>
 	}
 
-	if (node.getKind() === ts.SyntaxKind.ClassDeclaration) {
-	}
+	return findCallerFunction(parent)
+}
+
+export async function processCodebase(path: string) {
+	const project = new Project({ skipAddingFilesFromTsConfig: true })
+	project.addSourceFilesAtPaths(path)
+
+	project.getSourceFiles().map((sourceFile) => {
+		const fileNode = makeDBNode(sourceFile, true)
+		nodes[fileNode.id] = fileNode
+
+		const allNodes = [
+			...sourceFile.getFunctions(),
+			...sourceFile.getTypeAliases(),
+			...sourceFile.getEnums(),
+			...sourceFile.getInterfaces(),
+			...sourceFile.getClasses(),
+			...sourceFile.getNamespaces(),
+		]
+
+		allNodes.forEach((node) => {
+			const fnNode = makeDBNode(node)
+			const fnID = fnNode.id
+			nodes[fnID] = fnNode
+			nodes[fnID].relations.push({
+				relation: "IN_FILE",
+				target: fileNode.id,
+			})
+
+			// Find call expressions for this function
+			node.findReferencesAsNodes().forEach((ref) => {
+				const callSite = ref.getFirstAncestorByKind(
+					ts.SyntaxKind.CallExpression
+				)
+				if (!callSite) return
+
+				const caller = findCallerFunction(callSite)
+				if (!caller) return
+
+				const callerFnID = generateNodeID(caller!)
+
+				const alreadyRelated = nodes[fnID].relations.some((rel) => {
+					return rel.target === callerFnID
+				})
+				if (alreadyRelated) return
+
+				nodes[fnID].relations.push({
+					relation: "CALLED_BY",
+					target: callerFnID,
+				})
+			})
+		})
+	})
 }
 
 async function ingest() {
@@ -28,13 +86,13 @@ async function ingest() {
 	const DIR = [
 		//
 		"./project",
-		"/mnt/Ren/@Codebase/bedrock/src",
 		"/mnt/Ren/@Codebase/bedrock/src/Components/Common/UI/",
+		"/mnt/Ren/@Codebase/bedrock/src/Lib",
+		"/mnt/Ren/@Codebase/bedrock/src",
 		"/home/yogesh/Desktop/Rocket.Chat",
 	]
-	await processCodebase(`${DIR.at(-1)!}/**/*.{ts,tsx}`, makeNode)
-
-	writeFileSync("data.json", JSON.stringify(records, null, 2))
+	await processCodebase(`${DIR.at(-1)!}/**/*.{ts,tsx}`)
+	writeJSON("nodes", nodes)
 
 	console.log("✅ Ingested")
 }
