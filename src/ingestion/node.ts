@@ -1,10 +1,35 @@
 import { Node, VariableStatement, ts } from "ts-morph"
 import { DBNode } from "../database/node.types"
 
+export const notFoundKindNames = new Set<string>()
+
+function getNodeName(node: Node<ts.Node>): string {
+	switch (node.getKind()) {
+		case ts.SyntaxKind.SourceFile:
+			return node.getSourceFile().getBaseName()
+		case ts.SyntaxKind.VariableStatement:
+		case ts.SyntaxKind.ExpressionStatement:
+			return (node as VariableStatement).getDeclarations()?.[0]?.getName() || ""
+		case ts.SyntaxKind.TypeAliasDeclaration:
+		case ts.SyntaxKind.EnumDeclaration:
+		case ts.SyntaxKind.MethodDeclaration:
+		case ts.SyntaxKind.FunctionDeclaration:
+		case ts.SyntaxKind.VariableDeclaration:
+		case ts.SyntaxKind.InterfaceDeclaration:
+		case ts.SyntaxKind.PropertyDeclaration:
+		case ts.SyntaxKind.ClassDeclaration:
+		case ts.SyntaxKind.ModuleDeclaration:
+			return node.getSymbol()?.getName() || ""
+		default:
+			notFoundKindNames.add(node.getKindName())
+			return node.getSymbol()?.getFullyQualifiedName().split(".")[1] || ""
+	}
+}
+
 export function generateNodeID(node: Node<ts.Node>) {
-	let id = `${node.getSourceFile().getFilePath()}:${node
-		.getSymbol()
-		?.getName()}:${node.getKind()}`
+	let id = `${node.getSourceFile().getFilePath()}:${getNodeName(
+		node
+	)}:${node.getKind()}`
 
 	return id
 }
@@ -15,30 +40,7 @@ export function generateFileID(node: Node<ts.Node>) {
 }
 
 export function makeDBNode(node: Node<ts.Node>, isFile?: boolean): DBNode {
-	let name = ""
-	switch (node.getKind()) {
-		case ts.SyntaxKind.SourceFile:
-			name = node.getSourceFile().getBaseName()
-			break
-		case ts.SyntaxKind.VariableStatement:
-		case ts.SyntaxKind.ExpressionStatement:
-			name = (node as VariableStatement).getDeclarations()?.[0]?.getName() || ""
-			break
-		case ts.SyntaxKind.TypeAliasDeclaration:
-		case ts.SyntaxKind.EnumDeclaration:
-		case ts.SyntaxKind.MethodDeclaration:
-		case ts.SyntaxKind.FunctionDeclaration:
-		case ts.SyntaxKind.VariableDeclaration:
-		case ts.SyntaxKind.InterfaceDeclaration:
-		case ts.SyntaxKind.PropertyDeclaration:
-		case ts.SyntaxKind.ClassDeclaration:
-		case ts.SyntaxKind.ModuleDeclaration:
-			name = node.getSymbol()?.getName() || ""
-			break
-		default:
-			name = node.getSymbol()?.getFullyQualifiedName().split(".")[1] || ""
-			break
-	}
+	let name = getNodeName(node)
 
 	const contents = node.getText().trim()
 	const comments = node.getFullText().match(/\/\*[\s\S]*?\*\/|\/\/.*/g) || []
