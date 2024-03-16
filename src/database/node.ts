@@ -1,29 +1,11 @@
 import cliProgress from "cli-progress"
-import { Transaction } from "neo4j-driver"
 import { db, verifyConnectivity } from "../core/neo4j"
 import { DBNode, NODE_NAMES_MAP } from "./node.types"
 
-export async function insertDBNode(
-	tx: Transaction,
-	node: DBNode,
-	relations: {
-		with: DBNode
-		relation: string
-		type: "in" | "out"
-	}[]
-): Promise<any> {
+function getNodeDBInsertQuery(node: DBNode): string {
 	let query = ""
-	query += relations
-		.map((x, i) => {
-			const name = x.with.name.replaceAll('"', '\\"')
-			const filePath = x.with.filePath.replaceAll('"', '\\"')
-			return `MATCH (${"m" + i}:${x.with.kind} { name: "${name}", kind: "${
-				x.with.kind
-			}", filePath: "${filePath}" })`
-		})
-		.join("\n")
-	query += "\n"
 	query += `CREATE (n:${NODE_NAMES_MAP[node.kind] ?? "Node"} {
+		id: $id,
 		name: $name,
 		kind: $kind,
 		type: $type,
@@ -31,26 +13,14 @@ export async function insertDBNode(
 		comments: $comments,
 		filePath: $filePath
 	})`
-	query += relations
-		.map((x, i) => `\nCREATE (n)-[:${x.relation}]->(${"m" + i})`)
-		.join("")
 
-	const jobs = []
-	jobs.push(tx.run(query, node).catch(() => console.error(query)))
-	for (const child of node.children) {
-		jobs.push(
-			insertDBNode(tx, child, [
-				{ relation: "LOCAL_OF", with: node, type: "out" },
-			])
-		)
-	}
-	return Promise.all(jobs)
+	return query
 }
 
-export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
+export async function insertDataIntoDB(data: Record<string, DBNode>) {
 	console.log(await verifyConnectivity())
 
-	const nodes = Object.values(data).flat(6)
+	const nodes = Object.values(data)
 	const progressBar = new cliProgress.Bar(
 		{
 			etaBuffer: 1,
@@ -61,31 +31,40 @@ export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
 		},
 		cliProgress.Presets.legacy
 	)
-	progressBar.start(nodes.length + 1, 0)
+	progressBar.start(
+		nodes.length + nodes.map((x) => x.relations).flat().length + 1,
+		0
+	)
 
 	const tx = db.beginTransaction()
 
 	await tx.run("MATCH (n) DETACH DELETE n")
 	progressBar.increment()
 
-	const jobs = []
-	for (const nodes of Object.values(data)) {
-		const fileNode: DBNode = {
-			name: "File",
-			kind: "File",
-			type: "File",
-			text: "",
-			comments: [],
-			filePath: nodes[0].filePath,
-			children: [],
-		}
+	await Promise.all(
+		nodes.map(async (node) => {
+			const query = getNodeDBInsertQuery(node)
+			try {
+				await tx.run(query, node)
+			} catch {
+				console.error(query)
+			}
+			progressBar.increment()
+		})
+	)
 
-		jobs.push(insertDBNode(tx, fileNode, []))
-		for (const node of nodes) {
+	const jobs: Promise<any>[] = []
+	for (const node of nodes) {
+		for (const relation of node.relations) {
+			const query = [
+				`MATCH (n { id: $nID })`,
+				`MATCH (m { id: $mID })`,
+				`CREATE (n)-[:${relation.relation}]->(m)\n`,
+			].join("\n")
 			jobs.push(
-				insertDBNode(tx, node, [
-					{ relation: "IS_DECLARED_IN", with: fileNode, type: "in" },
-				]).then(() => progressBar.increment())
+				tx.run(query, { nID: node.id, mID: relation.target }).then(() => {
+					progressBar.increment()
+				})
 			)
 		}
 	}
