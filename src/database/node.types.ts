@@ -1,4 +1,5 @@
 export type DBNode = {
+	id: string
 	name: string
 	kind: string
 	type: string
@@ -7,7 +8,7 @@ export type DBNode = {
 	comments: string[]
 
 	filePath: string
-	children: DBNode[]
+	relations: { target: string; relation: string }[]
 }
 
 export const NODE_NAMES_MAP: Record<string, string> = {
