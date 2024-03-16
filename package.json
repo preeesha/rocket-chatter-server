@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "(cls | clear) && ts-node ./src/main.ts"
+    "start": "(cls | clear) && ts-node ./src/main.ts",
+    "ingest": "(cls | clear) && ts-node ./src/ingestion/ingest.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.27",

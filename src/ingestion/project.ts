@@ -1,6 +1,5 @@
-import { Node, Project, ts } from "ts-morph"
-
-export type NodeCallback = (node: Node<ts.Node>) => any
+import { Project } from "ts-morph"
+import { NodeCallback } from "./project.types"
 
 export async function processCodebase(path: string, callback: NodeCallback) {
 	const project = new Project({ skipAddingFilesFromTsConfig: true })

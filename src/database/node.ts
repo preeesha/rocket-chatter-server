@@ -1,10 +1,50 @@
 import cliProgress from "cli-progress"
-import { writeFileSync } from "fs"
-import { db, verifyConnectivity } from "./core/neo4j"
-import { DBNode, insertDBNode } from "./node"
+import { Transaction } from "neo4j-driver"
+import { db, verifyConnectivity } from "../core/neo4j"
+import { DBNode, NODE_NAMES_MAP } from "./node.types"
 
-export async function ingestData(data: Record<string, DBNode[]>) {
-	writeFileSync("data.json", JSON.stringify(data, null, 2))
+export async function insertDBNode(
+	tx: Transaction,
+	node: DBNode,
+	relations: {
+		with: DBNode
+		relation: string
+		type: "in" | "out"
+	}[]
+): Promise<any> {
+	let query = ""
+	query += relations
+		.map((x, i) => {
+			const name = x.with.name.replaceAll('"', '\\"')
+			const filePath = x.with.filePath.replaceAll('"', '\\"')
+			return `MATCH (${"m" + i}:${x.with.kind} { name: "${name}", kind: "${
+				x.with.kind
+			}", filePath: "${filePath}" })`
+		})
+		.join("\n")
+	query += "\n"
+	query += `CREATE (n:${NODE_NAMES_MAP[node.kind] ?? "Node"} {
+		name: $name,
+		kind: $kind,
+		type: $type,
+		text: $text,
+		comments: $comments,
+		filePath: $filePath
+	})`
+	query += relations
+		.map((x, i) => `\nCREATE (n)-[:${x.relation}]->(${"m" + i})`)
+		.join("")
+
+	const jobs = []
+	jobs.push(tx.run(query, node).catch(() => console.error(query)))
+	for (const child of node.children) {
+		jobs.push(
+			insertDBNode(tx, child, [
+				{ relation: "LOCAL_OF", with: node, type: "out" },
+			])
+		)
+	}
+	return Promise.all(jobs)
 }
 
 export async function insertDataIntoDB(data: Record<string, DBNode[]>) {
