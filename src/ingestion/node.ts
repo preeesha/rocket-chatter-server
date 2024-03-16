@@ -1,9 +1,25 @@
 import { Node, VariableStatement, ts } from "ts-morph"
 import { DBNode } from "../database/node.types"
 
-export function makeDBNode(node: Node<ts.Node>): DBNode {
+export function generateNodeID(node: Node<ts.Node>) {
+	let id = `${node.getSourceFile().getFilePath()}:${node
+		.getSymbol()
+		?.getName()}:${node.getKind()}`
+
+	return id
+}
+
+export function generateFileID(node: Node<ts.Node>) {
+	const id = `${node.getSourceFile().getFilePath()}`
+	return id
+}
+
+export function makeDBNode(node: Node<ts.Node>, isFile?: boolean): DBNode {
 	let name = ""
 	switch (node.getKind()) {
+		case ts.SyntaxKind.SourceFile:
+			name = node.getSourceFile().getBaseName()
+			break
 		case ts.SyntaxKind.VariableStatement:
 		case ts.SyntaxKind.ExpressionStatement:
 			name = (node as VariableStatement).getDeclarations()?.[0]?.getName() || ""
@@ -28,15 +44,17 @@ export function makeDBNode(node: Node<ts.Node>): DBNode {
 	const comments = node.getFullText().match(/\/\*[\s\S]*?\*\/|\/\/.*/g) || []
 
 	const n: DBNode = {
+		id: isFile ? generateFileID(node) : generateNodeID(node),
+		relations: [],
+
 		name: name,
-		kind: node.getKindName(),
-		type: node.getType().getText() || "any",
+		kind: isFile ? "File" : node.getKindName(),
+		type: isFile ? "File" : node.getType().getText() || "any",
 
 		text: contents,
 		comments: comments.map((c) => c.trim()),
 
 		filePath: node.getSourceFile().getFilePath(),
-		children: [],
 	}
 
 	return n
