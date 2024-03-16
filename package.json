@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "(cls | clear) && ts-node ./src/main.ts",
-    "ingest": "(cls | clear) && ts-node ./src/ingestion/ingest.ts"
+    "ingest": "(cls | clear) && ts-node ./src/ingestion/ingest.ts",
+    "all": "npm run ingest && npm run start"
   },
   "devDependencies": {
     "@types/node": "^20.11.27",
