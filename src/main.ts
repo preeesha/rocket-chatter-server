@@ -3,7 +3,7 @@ import { closeDBConnection } from "./core/neo4j"
 import { insertDataIntoDB } from "./database/node"
 
 async function main() {
-	await insertDataIntoDB(JSON.parse(readFileSync("data.json", "utf-8"))).then(
+	await insertDataIntoDB(JSON.parse(readFileSync("nodes.data.json", "utf-8"))).then(
 		() => closeDBConnection()
 	)
 }
