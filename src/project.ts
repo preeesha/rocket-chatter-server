@@ -9,23 +9,14 @@ export async function processCodebase(path: string, callback: NodeCallback) {
 	// Iterate over source files
 	for (const sourceFile of project.getSourceFiles()) {
 		const allNodes = [
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ArrowFunction),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.FunctionDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.FunctionExpression),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.MethodDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ClassDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.InterfaceDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.EnumDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.NamespaceExportDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.TypeAliasDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ImportDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ExportDeclaration),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ExportAssignment),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ExportSpecifier),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ImportSpecifier),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ImportClause),
-			...sourceFile.getChildrenOfKind(ts.SyntaxKind.ImportEqualsDeclaration),
+			...sourceFile.getFunctions(),
+			...sourceFile.getVariableStatements(),
+			...sourceFile.getEnums(),
+			...sourceFile.getClasses(),
+			...sourceFile.getTypeAliases(),
+			...sourceFile.getInterfaces(),
+			...sourceFile.getNamespaces(),
+			...sourceFile.getImportDeclarations(),
 		]
 		for (const node of allNodes) {
 			callback(node)
