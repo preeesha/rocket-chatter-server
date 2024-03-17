@@ -130,13 +130,13 @@ async function ingest() {
 	const DIR = [
 		//
 		"/mnt/Ren/@Codebase/bedrock/src/Components/Common/UI/",
-		"/mnt/Ren/@Codebase/bedrock/src/Lib",
 		"/mnt/Ren/@Codebase/bedrock/src",
-		"./project",
 		"/home/yogesh/Desktop/Rocket.Chat",
+		"./project",
+		"/mnt/Ren/@Codebase/bedrock/src/Lib",
 	]
 	await processCodebase(`${DIR.at(-1)!}/**/*.{ts,tsx}`)
-	writeJSON("nodes", nodes)
+	writeJSON("ingested", nodes)
 
 	console.log()
 	console.log()
