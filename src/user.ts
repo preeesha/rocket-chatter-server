@@ -19,7 +19,11 @@ function writeJSON(file: string, data: any) {
 	writeFileSync(`${file}.data.json`, JSON.stringify(data, null, 2))
 }
 
-async function getDBKeywordsFromQuery(query: string): Promise<string[]> {
+async function getLLMOutput(
+	systemPrompt: string,
+	userPrompt: string
+): Promise<string> {
+	/* OLLAMA BASED LLM USAGE */
 	// const reponse = await ollama.chat({
 	// 	model: LLM_MODEL,
 	// 	options: {
@@ -31,19 +35,21 @@ async function getDBKeywordsFromQuery(query: string): Promise<string[]> {
 	// 	],
 	// })
 	// const content = response.message.content
-
+	// return content
+	//
+	/* HUGGINGFACE BASED LLM USAGE */
 	const output = await textGeneration({
 		accessToken: HF_KEY,
 		model: LLM_MODEL,
-		inputs: `${DB_QUERY_BASE_PROMPT}\n<QUERY_START>\nQUERY: ${query}\n<QUERY_END>`,
+		inputs: `${systemPrompt}\n<QUERY_START>\n${userPrompt}\n<QUERY_END>`,
 		parameters: {
 			temprature: 0,
+			max_new_tokens: 20_000,
 		},
 	})
 	const content = output.generated_text.split("<QUERY_END>").at(-1).trim()
 
-	const parsedQuery: Record<string, string[]> = JSON.parse(content)
-	return Object.values(parsedQuery).flat()
+	return content
 }
 
 async function getCodeNodesFromKeywords(keywords: string[]): Promise<any[]> {
@@ -70,41 +76,20 @@ async function getCodeNodesFromKeywords(keywords: string[]): Promise<any[]> {
 	return results
 }
 
+async function getDBKeywordsFromQuery(query: string): Promise<string[]> {
+	const content = await getLLMOutput(DB_QUERY_BASE_PROMPT, query)
+	const parsedQuery: Record<string, string[]> = JSON.parse(content)
+	return Object.values(parsedQuery).flat()
+}
+
 async function getAnswerOfUserQueryFromNodesData(
 	query: string,
 	nodes: any[]
 ): Promise<string> {
-	// const response = await ollama.chat({
-	// 	model: LLM_MODEL,
-	// 	options: {
-	// 		temperature: 0,
-	// 	},
-	// 	messages: [
-	// 		{
-	// 			role: "system",
-	// 			content: QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
-	// 		},
-	// 		{ role: "user", content: query },
-	// 	],
-	// })
-	// const content = response.message.content
-
-	const systemPrompt = QA_BASE_PROMPT.replace(
-		"$CODEBASE",
-		JSON.stringify(nodes)
+	const content = await getLLMOutput(
+		QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
+		query
 	)
-	const userPrompt = `<QUERY_START>\nQUERY: ${query}\n<QUERY_END>`
-
-	const output = await textGeneration({
-		accessToken: HF_KEY,
-		model: LLM_MODEL,
-		inputs: `${systemPrompt}\n${userPrompt}`,
-		parameters: {
-			temprature: 0,
-			max_new_tokens: 20000,
-		},
-	})
-	const content = output.generated_text.split("<QUERY_END>").at(-1).trim()
 
 	return content
 }
