@@ -1,4 +1,4 @@
-export const LLM_MODEL = "codellama:7b"
+export const LLM_MODEL = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 export const DB_QUERY_BASE_PROMPT = `
 user will ask you a query about a codebase, you need to extract information from the query in form of a json only where key is the type of symbol (out of Function, File, Variable, Enum, Class, Type, Interface, Namespace, Member, Import, Module only) and the value is an array of values.

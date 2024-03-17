@@ -1,8 +1,14 @@
 import { writeFileSync } from "fs"
-import ollama from "ollama"
 import { createInterface } from "readline/promises"
 import { DB_QUERY_BASE_PROMPT, LLM_MODEL, QA_BASE_PROMPT } from "./constants"
 import { closeDBConnection, db } from "./core/neo4j"
+
+import { textGeneration } from "@huggingface/inference"
+import { configDotenv } from "dotenv"
+
+configDotenv()
+
+const HF_KEY = process.env["HF_KEY"]
 
 const readline = createInterface({
 	input: process.stdin,
@@ -14,21 +20,29 @@ function writeJSON(file: string, data: any) {
 }
 
 async function getDBKeywordsFromQuery(query: string): Promise<string[]> {
-	const reponse = await ollama.chat({
+	// const reponse = await ollama.chat({
+	// 	model: LLM_MODEL,
+	// 	options: {
+	// 		temperature: 0,
+	// 	},
+	// 	messages: [
+	// 		{ role: "system", content: DB_QUERY_BASE_PROMPT },
+	// 		{ role: "user", content: query },
+	// 	],
+	// })
+	// const content = response.message.content
+
+	const output = await textGeneration({
+		accessToken: HF_KEY,
 		model: LLM_MODEL,
-		options: {
-			temperature: 0,
+		inputs: `${DB_QUERY_BASE_PROMPT}\n<QUERY_START>\nQUERY: ${query}\n<QUERY_END>`,
+		parameters: {
+			temprature: 0,
 		},
-		messages: [
-			{ role: "system", content: DB_QUERY_BASE_PROMPT },
-			{ role: "user", content: query },
-		],
 	})
+	const content = output.generated_text.split("<QUERY_END>").at(-1).trim()
 
-	const parsedQuery: Record<string, string[]> = JSON.parse(
-		reponse.message.content
-	)
-
+	const parsedQuery: Record<string, string[]> = JSON.parse(content)
 	return Object.values(parsedQuery).flat()
 }
 
@@ -45,6 +59,8 @@ async function getCodeNodesFromKeywords(keywords: string[]): Promise<any[]> {
 		)
 
 		const data = result.records.map((record) => record.toObject())
+		if (!data.length) continue
+
 		results.push(data[0].n.properties)
 		for (const record of data) {
 			results.push(record.m.properties)
@@ -58,32 +74,49 @@ async function getAnswerOfUserQueryFromNodesData(
 	query: string,
 	nodes: any[]
 ): Promise<string> {
-	console.log(QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)))
-	const response = await ollama.chat({
+	// const response = await ollama.chat({
+	// 	model: LLM_MODEL,
+	// 	options: {
+	// 		temperature: 0,
+	// 	},
+	// 	messages: [
+	// 		{
+	// 			role: "system",
+	// 			content: QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
+	// 		},
+	// 		{ role: "user", content: query },
+	// 	],
+	// })
+	// const content = response.message.content
+
+	const systemPrompt = QA_BASE_PROMPT.replace(
+		"$CODEBASE",
+		JSON.stringify(nodes)
+	)
+	const userPrompt = `<QUERY_START>\nQUERY: ${query}\n<QUERY_END>`
+
+	const output = await textGeneration({
+		accessToken: HF_KEY,
 		model: LLM_MODEL,
-		options: {
-			temperature: 0,
+		inputs: `${systemPrompt}\n${userPrompt}`,
+		parameters: {
+			temprature: 0,
+			max_new_tokens: 20000,
 		},
-		messages: [
-			{
-				role: "system",
-				content: QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
-			},
-			{ role: "user", content: query },
-		],
 	})
+	const content = output.generated_text.split("<QUERY_END>").at(-1).trim()
 
-	const answer = response.message.content
-
-	return answer
+	return content
 }
 
 async function use() {
 	// publishRelease
+	// i don't understand the architecture of the application
 
 	while (true) {
 		console.clear()
 		const query =
+			// "I don't understand why the hell useArrowController is here and what's the need of it in the main function of message component. also how is it related to the publishRelease function" ||
 			// "Why the hell this publishRelease is here" ||
 			await readline.question("Enter your query: ")
 
@@ -94,11 +127,11 @@ async function use() {
 		console.log("CODE NODES FETCHED")
 		writeJSON("results", results)
 
-		await readline.question("")
+		const answer = await getAnswerOfUserQueryFromNodesData(query, results)
+		console.log("ANSWER:")
+		console.log(answer)
 
-		// const answer = await getAnswerOfUserQueryFromNodesData(query, results)
-		// console.log("ANSWER:")
-		// console.log(answer)
+		break
 	}
 
 	readline.close()
