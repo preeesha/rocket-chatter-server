@@ -9,7 +9,7 @@ The output MUST BE IN ONLY AND ONLY JSON. The output MUST BE IN ONLY AND ONLY JS
 `
 
 export const QA_BASE_PROMPT = `
-you are an expert in understanding and answering questions of user when given a proper context of the codebase
+you are an expert in understanding and answering questions of user when given a proper context of the codebase.
 
 here's the codebase, based on this solve the user's query:
 ---
