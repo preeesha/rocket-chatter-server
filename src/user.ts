@@ -115,51 +115,53 @@ async function getAnswerOfUserQueryFromNodesData(
 	return [answerContent, diagramContent]
 }
 
-async function use() {
-	// publishRelease
-	// i don't understand the architecture of the application
+async function resolveQuery(query: string): Promise<{
+	answer: string
+	diagram: string | null
+}> {
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 * STEP 1:
+	 * Extract the possible keywords from the user's query
+	 * ---------------------------------------------------------------------------------------------
+	 */
+	const [keywords, diagramRequired] = await getDBKeywordsFromQuery(query)
+	console.log("KEYWORDS:", keywords.join(", "), "DIAGRAM:", diagramRequired)
 
-	while (true) {
-		const query =
-			// "I don't understand why the hell useArrowController is here and what's the need of it in the main function of message component. also how is it related to the publishRelease function" ||
-			// "Why the hell this publishRelease is here" ||
-			await readline.question("Enter your query: ")
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 * STEP 2:
+	 * Query the database to find the nodes names of which are similar to what user has requested
+	 * ---------------------------------------------------------------------------------------------
+	 */
+	const results = await getCodeNodesFromKeywords(keywords)
+	if (!results.length) return { answer: "", diagram: null }
 
-		const [keywords, diagramRequired] = await getDBKeywordsFromQuery(query)
-		console.log("KEYWORDS:", keywords.join(", "), "DIAGRAM:", diagramRequired)
+	writeJSON("results", results)
+	console.log("CODE NODES FETCHED")
 
-		const results = await getCodeNodesFromKeywords(keywords)
-		console.log("CODE NODES FETCHED")
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 * STEP 3:
+	 * Generate the answer and diagram for the user's query given the nodes data
+	 * ---------------------------------------------------------------------------------------------
+	 */
+	const [answer, diagram] = await getAnswerOfUserQueryFromNodesData(
+		query,
+		results,
+		diagramRequired
+	)
 
-		if (!results.length) {
-			console.log("No data found for the query")
-			continue
-		} else {
-			const [answer, diagram] = await getAnswerOfUserQueryFromNodesData(
-				query,
-				results,
-				diagramRequired
-			)
+	return { answer, diagram }
+}
 
-			console.log("ANSWER:")
-			console.log(answer)
-			writeJSON("results", results)
+async function main() {
+	const query = await readline.question("Enter your query: ")
+	const { answer, diagram } = await resolveQuery(query)
+	console.log("ANSWER:", answer)
+	if (diagram) console.log("DIAGRAM:", diagram)
 
-			if (diagram) {
-				console.log("DIAGRAM:")
-				console.log(diagram)
-				writeText("diagram", diagram)
-			} else {
-				console.log("No diagram found for the query")
-			}
-		}
-
-		console.log()
-		console.log()
-	}
-
-	readline.close()
 	closeDBConnection()
 }
 
-use()
+main()
