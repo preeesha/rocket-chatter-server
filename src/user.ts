@@ -3,19 +3,25 @@ import { writeFileSync } from "fs"
 import { createInterface } from "readline/promises"
 import {
 	DB_QUERY_BASE_PROMPT,
+	DIAGRAM_BASE_PROMPT,
 	HF_KEY,
 	LLM_MODEL,
 	QA_BASE_PROMPT,
 } from "./constants"
 import { closeDBConnection, db } from "./core/neo4j"
+import { generateEmbeddings } from "./ingestion/node"
 
 const readline = createInterface({
 	input: process.stdin,
 	output: process.stdout,
 })
 
+function writeText(file: string, data: string) {
+	writeFileSync(`${file}.data.json`, data)
+}
+
 function writeJSON(file: string, data: any) {
-	writeFileSync(`${file}.data.json`, JSON.stringify(data, null, 2))
+	writeText(file, JSON.stringify(data, null, 2))
 }
 
 async function getLLMOutput(
@@ -54,43 +60,59 @@ async function getLLMOutput(
 async function getCodeNodesFromKeywords(keywords: string[]): Promise<any[]> {
 	const results: any[] = []
 	for (const keyword of keywords) {
+		const queryText = await generateEmbeddings(keyword)
 		const result = await db.run(
 			`
-					MATCH (n:Function {name: $keyword})-[r]-(m)
-					RETURN n, type(r), m
-					LIMIT 200
-				`,
-			{ keyword: keyword }
+			CALL db.index.vector.queryNodes("embeddings", 2, $queryText) 
+			YIELD node, score 
+			WHERE score >= 0.9
+			WITH node 
+			MATCH (node)-[r]->(relatedNode) 
+			RETURN node, COLLECT(relatedNode) AS relatedNodes
+			`,
+			{ queryText: queryText }
 		)
 
 		const data = result.records.map((record) => record.toObject())
 		if (!data.length) continue
 
-		results.push(data[0].n.properties)
 		for (const record of data) {
-			results.push(record.m.properties)
+			const n = record.node.properties
+			delete n["embeddings"]
+			results.push(n)
 		}
 	}
 
 	return results
 }
 
-async function getDBKeywordsFromQuery(query: string): Promise<string[]> {
+async function getDBKeywordsFromQuery(
+	query: string
+): Promise<[string[], boolean]> {
 	const content = await getLLMOutput(DB_QUERY_BASE_PROMPT, query)
 	const parsedQuery: Record<string, string[]> = JSON.parse(content)
-	return Object.values(parsedQuery).flat()
+	const diagramRequired = !!parsedQuery["diagram"]
+	delete parsedQuery["diagram"]
+	return [Object.values(parsedQuery).flat(), diagramRequired]
 }
 
 async function getAnswerOfUserQueryFromNodesData(
 	query: string,
-	nodes: any[]
-): Promise<string> {
-	const content = await getLLMOutput(
+	nodes: any[],
+	diagramRequired: boolean
+): Promise<[string, string | null]> {
+	const answerContent = await getLLMOutput(
 		QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
 		query
 	)
+	if (!diagramRequired) return [answerContent, null]
 
-	return content
+	const diagramContent = await getLLMOutput(
+		DIAGRAM_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
+		query
+	)
+
+	return [answerContent, diagramContent]
 }
 
 async function use() {
@@ -103,16 +125,34 @@ async function use() {
 			// "Why the hell this publishRelease is here" ||
 			await readline.question("Enter your query: ")
 
-		const keywords = await getDBKeywordsFromQuery(query)
-		console.log("KEYWORDS:", keywords.join(", "))
+		const [keywords, diagramRequired] = await getDBKeywordsFromQuery(query)
+		console.log("KEYWORDS:", keywords.join(", "), "DIAGRAM:", diagramRequired)
 
 		const results = await getCodeNodesFromKeywords(keywords)
 		console.log("CODE NODES FETCHED")
-		writeJSON("results", results)
 
-		const answer = await getAnswerOfUserQueryFromNodesData(query, results)
-		console.log("ANSWER:")
-		console.log(answer)
+		if (!results.length) {
+			console.log("No data found for the query")
+			continue
+		} else {
+			const [answer, diagram] = await getAnswerOfUserQueryFromNodesData(
+				query,
+				results,
+				diagramRequired
+			)
+
+			console.log("ANSWER:")
+			console.log(answer)
+			writeJSON("results", results)
+
+			if (diagram) {
+				console.log("DIAGRAM:")
+				console.log(diagram)
+				writeText("diagram", diagram)
+			} else {
+				console.log("No diagram found for the query")
+			}
+		}
 
 		console.log()
 		console.log()
