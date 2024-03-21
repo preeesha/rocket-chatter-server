@@ -32,96 +32,100 @@ export async function processCodebase(path: string) {
 	const project = new Project({ skipAddingFilesFromTsConfig: true })
 	project.addSourceFilesAtPaths(path)
 
-	project.getSourceFiles().map((sourceFile) => {
-		const fileNode = makeDBNode(sourceFile, true)
-		nodes[fileNode.id] = fileNode
+	await Promise.all(
+		project.getSourceFiles().map(async (sourceFile) => {
+			const fileNode = await makeDBNode(sourceFile, true)
+			nodes[fileNode.id] = fileNode
 
-		const allNodes = [
-			...sourceFile.getFunctions(),
-			...sourceFile.getTypeAliases(),
-			...sourceFile.getEnums(),
-			...sourceFile.getInterfaces(),
-			...sourceFile.getClasses(),
-			...sourceFile.getNamespaces(),
-		]
+			const allNodes = [
+				...sourceFile.getFunctions(),
+				...sourceFile.getTypeAliases(),
+				...sourceFile.getEnums(),
+				...sourceFile.getInterfaces(),
+				...sourceFile.getClasses(),
+				...sourceFile.getNamespaces(),
+			]
 
-		allNodes.forEach((node) => {
-			const fnNode = makeDBNode(node)
-			const fnID = fnNode.id
-			nodes[fnID] = fnNode
-			nodes[fnID].relations.push({
-				relation: "IN_FILE",
-				target: fileNode.id,
-			})
+			await Promise.all(
+				allNodes.map(async (node) => {
+					const fnNode = await makeDBNode(node)
+					const fnID = fnNode.id
+					nodes[fnID] = fnNode
+					nodes[fnID].relations.push({
+						relation: "IN_FILE",
+						target: fileNode.id,
+					})
 
-			// Find call expressions for this function
-			node.findReferencesAsNodes().forEach((ref) => {
-				kindNames.add(ref.getKindName())
-				switch (ref.getKind()) {
-					case ts.SyntaxKind.ArrowFunction:
-					case ts.SyntaxKind.FunctionDeclaration:
-					case ts.SyntaxKind.FunctionExpression: {
-						const nodeLocation = ref.getFirstAncestorByKind(
-							ts.SyntaxKind.CallExpression
-						)
-						if (!nodeLocation) return
+					// Find call expressions for this function
+					node.findReferencesAsNodes().forEach((ref) => {
+						kindNames.add(ref.getKindName())
+						switch (ref.getKind()) {
+							case ts.SyntaxKind.ArrowFunction:
+							case ts.SyntaxKind.FunctionDeclaration:
+							case ts.SyntaxKind.FunctionExpression: {
+								const nodeLocation = ref.getFirstAncestorByKind(
+									ts.SyntaxKind.CallExpression
+								)
+								if (!nodeLocation) return
 
-						const parent = moveUpWhileParentFound(nodeLocation, [
-							ts.SyntaxKind.FunctionDeclaration,
-							ts.SyntaxKind.ArrowFunction,
-							ts.SyntaxKind.SourceFile,
-						])
-						if (!parent) return
+								const parent = moveUpWhileParentFound(nodeLocation, [
+									ts.SyntaxKind.FunctionDeclaration,
+									ts.SyntaxKind.ArrowFunction,
+									ts.SyntaxKind.SourceFile,
+								])
+								if (!parent) return
 
-						const parentID = generateNodeID(parent!)
+								const parentID = generateNodeID(parent!)
 
-						const isAlreadyRelated = nodes[fnID].relations.some((rel) => {
-							return rel.target === parentID
-						})
-						if (isAlreadyRelated) return
+								const isAlreadyRelated = nodes[fnID].relations.some((rel) => {
+									return rel.target === parentID
+								})
+								if (isAlreadyRelated) return
 
-						nodes[fnID].relations.push({
-							relation: "CALLED_BY",
-							target: parentID,
-						})
+								nodes[fnID].relations.push({
+									relation: "CALLED_BY",
+									target: parentID,
+								})
 
-						break
-					}
+								break
+							}
 
-					case ts.SyntaxKind.Identifier: {
-						const nodeLocation = ref.getFirstAncestor()
-						if (!nodeLocation) return
+							case ts.SyntaxKind.Identifier: {
+								const nodeLocation = ref.getFirstAncestor()
+								if (!nodeLocation) return
 
-						const parent = moveUpWhileParentFound(nodeLocation, [
-							ts.SyntaxKind.TypeAliasDeclaration,
-							ts.SyntaxKind.FunctionDeclaration,
-							ts.SyntaxKind.ArrowFunction,
-							ts.SyntaxKind.SourceFile,
-						])
-						if (!parent) return
+								const parent = moveUpWhileParentFound(nodeLocation, [
+									ts.SyntaxKind.TypeAliasDeclaration,
+									ts.SyntaxKind.FunctionDeclaration,
+									ts.SyntaxKind.ArrowFunction,
+									ts.SyntaxKind.SourceFile,
+								])
+								if (!parent) return
 
-						const parentID = generateNodeID(parent!)
-						const isAlreadyRelated = nodes[fnID].relations.some((rel) => {
-							return rel.target === parentID
-						})
-						if (isAlreadyRelated) return
+								const parentID = generateNodeID(parent!)
+								const isAlreadyRelated = nodes[fnID].relations.some((rel) => {
+									return rel.target === parentID
+								})
+								if (isAlreadyRelated) return
 
-						nodes[fnID].relations.push({
-							relation: "USED_IN",
-							target: parentID,
-						})
+								nodes[fnID].relations.push({
+									relation: "USED_IN",
+									target: parentID,
+								})
 
-						break
-					}
+								break
+							}
 
-					default: {
-						unhandledRefKinds.add(ref.getKindName())
-						console.log("Unhandled ref", ref.getKindName())
-					}
-				}
-			})
+							default: {
+								unhandledRefKinds.add(ref.getKindName())
+								console.log("Unhandled ref", ref.getKindName())
+							}
+						}
+					})
+				})
+			)
 		})
-	})
+	)
 }
 
 async function ingest() {
@@ -129,8 +133,8 @@ async function ingest() {
 
 	const DIR = [
 		//
-		"/home/yogesh/Desktop/Rocket.Chat",
 		"./project",
+		"/home/yogesh/Desktop/Rocket.Chat",
 	]
 	await processCodebase(`${DIR.at(-1)!}/**/*.{ts,tsx}`)
 	writeJSON("ingested", nodes)
@@ -149,3 +153,24 @@ async function ingest() {
 }
 
 ingest()
+
+// async function a() {
+// 	const queryText = await generateEmbeddings("aFunction")
+
+// 	const result = await db.run(
+// 		`
+// 			CALL db.index.vector.queryNodes("embeddings", 2, $queryText)
+// 			YIELD node, score
+// 			WHERE score >= 0.9
+// 			WITH node
+// 			MATCH (node)-[r]->(relatedNode)
+// 			RETURN node, COLLECT(relatedNode) AS relatedNodes
+// 		`,
+// 		{
+// 			queryText: queryText,
+// 		}
+// 	)
+// 	console.log(result.records.map((r) => r.get("node").properties.name))
+// }
+
+// a()

@@ -11,7 +11,9 @@ function getNodeDBInsertQuery(node: DBNode): string {
 		type: $type,
 		text: $text,
 		comments: $comments,
-		filePath: $filePath
+		filePath: $filePath,
+
+		embeddings: $embeddings
 	})`
 
 	return query

@@ -9,6 +9,8 @@ export type DBNode = {
 
 	filePath: string
 	relations: { target: string; relation: string }[]
+
+	embeddings: number[]
 }
 
 export const NODE_NAMES_MAP: Record<string, string> = {

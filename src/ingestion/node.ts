@@ -1,5 +1,9 @@
+import OpenAI from "openai"
 import { Node, VariableStatement, ts } from "ts-morph"
+import { OPENAI_KEY } from "../constants"
 import { DBNode } from "../database/node.types"
+
+const openai = new OpenAI({ apiKey: OPENAI_KEY })
 
 export const notFoundKindNames = new Set<string>()
 
@@ -39,7 +43,20 @@ export function generateFileID(node: Node<ts.Node>) {
 	return id
 }
 
-export function makeDBNode(node: Node<ts.Node>, isFile?: boolean): DBNode {
+export async function generateEmbeddings(name: string): Promise<any> {
+	const content = await openai.embeddings.create({
+		model: "text-embedding-3-small",
+		input: name,
+		dimensions: 768,
+		encoding_format: "float",
+	})
+	return content.data[0].embedding
+}
+
+export async function makeDBNode(
+	node: Node<ts.Node>,
+	isFile?: boolean
+): Promise<DBNode> {
 	let name = getNodeName(node)
 
 	const contents = node.getText().trim()
@@ -48,6 +65,8 @@ export function makeDBNode(node: Node<ts.Node>, isFile?: boolean): DBNode {
 	const n: DBNode = {
 		id: isFile ? generateFileID(node) : generateNodeID(node),
 		relations: [],
+
+		embeddings: await generateEmbeddings(name),
 
 		name: name,
 		kind: isFile ? "File" : node.getKindName(),
