@@ -133,8 +133,8 @@ async function ingest() {
 
 	const DIR = [
 		//
+		"~/Desktop/Rocket.Chat",
 		"./project",
-		"/home/yogesh/Desktop/Rocket.Chat",
 	]
 	await processCodebase(`${DIR.at(-1)!}/**/*.{ts,tsx}`)
 	writeJSON("ingested", nodes)
@@ -153,24 +153,3 @@ async function ingest() {
 }
 
 ingest()
-
-// async function a() {
-// 	const queryText = await generateEmbeddings("aFunction")
-
-// 	const result = await db.run(
-// 		`
-// 			CALL db.index.vector.queryNodes("embeddings", 2, $queryText)
-// 			YIELD node, score
-// 			WHERE score >= 0.9
-// 			WITH node
-// 			MATCH (node)-[r]->(relatedNode)
-// 			RETURN node, COLLECT(relatedNode) AS relatedNodes
-// 		`,
-// 		{
-// 			queryText: queryText,
-// 		}
-// 	)
-// 	console.log(result.records.map((r) => r.get("node").properties.name))
-// }
-
-// a()
