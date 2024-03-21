@@ -1,14 +1,13 @@
+import { textGeneration } from "@huggingface/inference"
 import { writeFileSync } from "fs"
 import { createInterface } from "readline/promises"
-import { DB_QUERY_BASE_PROMPT, LLM_MODEL, QA_BASE_PROMPT } from "./constants"
+import {
+	DB_QUERY_BASE_PROMPT,
+	HF_KEY,
+	LLM_MODEL,
+	QA_BASE_PROMPT,
+} from "./constants"
 import { closeDBConnection, db } from "./core/neo4j"
-
-import { textGeneration } from "@huggingface/inference"
-import { configDotenv } from "dotenv"
-
-configDotenv()
-
-const HF_KEY = process.env["HF_KEY"]
 
 const readline = createInterface({
 	input: process.stdin,
@@ -99,7 +98,6 @@ async function use() {
 	// i don't understand the architecture of the application
 
 	while (true) {
-		console.clear()
 		const query =
 			// "I don't understand why the hell useArrowController is here and what's the need of it in the main function of message component. also how is it related to the publishRelease function" ||
 			// "Why the hell this publishRelease is here" ||
@@ -116,7 +114,8 @@ async function use() {
 		console.log("ANSWER:")
 		console.log(answer)
 
-		break
+		console.log()
+		console.log()
 	}
 
 	readline.close()

@@ -1,3 +1,8 @@
+import { configDotenv } from "dotenv"
+configDotenv()
+
+export const HF_KEY = process.env["HF_KEY"]
+
 export const LLM_MODEL = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 export const DB_QUERY_BASE_PROMPT = `
