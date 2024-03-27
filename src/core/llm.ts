@@ -19,7 +19,7 @@ export namespace LLM {
 	export async function generateOutput(
 		systemPrompt: string,
 		userPrompt: string
-	): Promise<string> {
+	): Promise<string | null> {
 		/* OLLAMA BASED LLM USAGE */
 		// const reponse = await ollama.chat({
 		// 	model: LLM_MODEL,
@@ -50,7 +50,7 @@ export namespace LLM {
 			return content
 		} catch (e) {
 			console.error(e)
-			return ""
+			return null
 		}
 	}
 }

@@ -48,6 +48,8 @@ async function getDBKeywordsFromQuery(
 	query: string
 ): Promise<[string[], boolean]> {
 	const content = await LLM.generateOutput(DB_QUERY_BASE_PROMPT, query)
+	if (!content) return [[], false]
+
 	const parsedQuery: Record<string, string[]> = JSON.parse(content)
 	const diagramRequired = !!parsedQuery["diagram"]
 	delete parsedQuery["diagram"]
@@ -63,6 +65,7 @@ async function getAnswerOfUserQueryFromNodesData(
 		QA_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(nodes)),
 		query
 	)
+	if (!answerContent) return ["", null]
 	if (!diagramRequired) return [answerContent, null]
 
 	const diagramContent = await LLM.generateOutput(
