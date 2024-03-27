@@ -1,6 +1,8 @@
 import { configDotenv } from "dotenv"
 configDotenv()
 
+export const PORT = process.env["PORT"]
+
 export const HF_KEY = process.env["HF_KEY"]
 export const OPENAI_KEY = process.env["OPENAI_KEY"]
 

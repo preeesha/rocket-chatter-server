@@ -1,11 +1,32 @@
-import { readFileSync } from "fs"
-import { closeDBConnection } from "./core/neo4j"
-import { insertDataIntoDB } from "./database/node"
+import cors from "cors"
+import express from "express"
+import { PORT } from "./constants"
+import { answerRoute } from "./routes/answer"
 
-async function main() {
-	await insertDataIntoDB(
-		JSON.parse(readFileSync("ingested.data.json", "utf-8"))
-	).then(() => closeDBConnection())
-}
+const app = express()
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cors({ origin: "*" }))
 
-main()
+app.post("/answer", answerRoute)
+
+app.listen(PORT, () => {
+	console.log(`🚀 Server running on port http://localhost:${PORT}`)
+})
+
+// import { createInterface } from "readline/promises"
+// import { resolveQuery } from "./core/query"
+
+// const readline = createInterface({
+// 	input: process.stdin,
+// 	output: process.stdout,
+// })
+
+// async function main() {
+// 	const query = await readline.question("Enter your query: ")
+// 	const { answer, diagram } = await resolveQuery(query)
+// 	console.log("ANSWER:", answer)
+// 	if (diagram) console.log("DIAGRAM:", diagram)
+// }
+
+// main()

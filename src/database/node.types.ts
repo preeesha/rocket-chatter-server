@@ -12,29 +12,3 @@ export type DBNode = {
 
 	embeddings: number[]
 }
-
-export const NODE_NAMES_MAP: Record<string, string> = {
-	File: "File",
-	FunctionDeclaration: "Function",
-
-	Parameter: "Variable",
-	BindingElement: "Variable",
-	VariableDeclaration: "Variable",
-	VariableStatement: "Variable",
-
-	EnumDeclaration: "Enum",
-	ClassDeclaration: "Class",
-	TypeAliasDeclaration: "Type",
-	InterfaceDeclaration: "Interface",
-	NamespaceDeclaration: "Namespace",
-
-	MethodDeclaration: "Member",
-	PropertyDeclaration: "Member",
-	GetAccessor: "Member",
-	SetAccessor: "Member",
-
-	ImportDeclaration: "Import",
-	ExpressionStatement: "Variable",
-
-	ModuleDeclaration: "Module",
-}
