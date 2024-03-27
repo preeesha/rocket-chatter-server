@@ -2,12 +2,14 @@ import cors from "cors"
 import express from "express"
 import { PORT } from "./constants"
 import { answerRoute } from "./routes/answer"
+import { healthRoute } from "./routes/health"
 
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({ origin: "*" }))
 
+app.get("/health", healthRoute)
 app.post("/answer", answerRoute)
 
 app.listen(PORT, () => {
