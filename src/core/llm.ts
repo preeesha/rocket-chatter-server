@@ -18,7 +18,7 @@ export namespace LLM {
 
 	export async function generateOutput(
 		systemPrompt: string,
-		userPrompt: string
+		userPrompt: string = ""
 	): Promise<string | null> {
 		/* OLLAMA BASED LLM USAGE */
 		// const reponse = await ollama.chat({
@@ -36,10 +36,12 @@ export namespace LLM {
 		//
 		/* HUGGINGFACE BASED LLM USAGE */
 		try {
+			let inputs = `${systemPrompt}\n`
+			if (userPrompt) inputs += `<QUERY_START>\n${userPrompt}\n<QUERY_END>`
 			const output = await textGeneration({
 				accessToken: HF_KEY,
 				model: LLM_MODEL,
-				inputs: `${systemPrompt}\n<QUERY_START>\n${userPrompt}\n<QUERY_END>`,
+				inputs: inputs,
 				parameters: {
 					temprature: 0,
 					max_new_tokens: 20_000,
