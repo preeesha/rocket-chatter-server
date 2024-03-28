@@ -15,7 +15,7 @@ export async function __translate__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords([targetEntity])
-	if (!codeNodes.length) return {}
+	if (!codeNodes.length) return { result: "" }
 
 	writeJSON("results", codeNodes)
 
@@ -31,10 +31,9 @@ export async function __translate__(
 			.replace("$TARGET_LANGUAGE", targetLanguage),
 		""
 	)
-	if (!result) return {}
+	if (!result) return { result: "" }
 
-	const data = JSON.parse(result)
-	return data
+	return { result }
 }
 
 export async function translateRoute(req: Request, res: Response) {

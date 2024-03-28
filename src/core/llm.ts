@@ -38,8 +38,7 @@ export namespace LLM {
 		/* HUGGINGFACE BASED LLM USAGE */
 		try {
 			let inputs = `${systemPrompt}\n`
-			if (userPrompt)
-				inputs += `<${userPromptDescriptor}_START>\n${userPrompt}\n<${userPromptDescriptor}_END>`
+			inputs += `<${userPromptDescriptor}_START>\n${userPrompt}\n<${userPromptDescriptor}_END>`
 			const output = await textGeneration({
 				accessToken: HF_KEY,
 				model: LLM_MODEL,
@@ -49,7 +48,7 @@ export namespace LLM {
 					max_new_tokens: 20_000,
 				},
 			})
-			const content = userPrompt
+			const content = !userPromptDescriptor
 				? output.generated_text
 				: output.generated_text
 						.split(`<${userPromptDescriptor}_END>`)

@@ -117,11 +117,10 @@ INPUT: Inter-related entities from a huge codebase in JSON format, target entity
 
 TASK: Based on the context (codebase) (external entities it uses) provided, translate the target entity to the language provided by the user.
 
-EXPECTED OUTPUT: code in the target language
+EXPECTED OUTPUT: code in the target language not in markdown format.
 
 RULES:
 - STRICTLY, do not make anything other than the answer to the user's query.
-- DON'T REPEAT THE EXAMPLES.
 - Do not provide any kind of diagram or visualization in the output.
 - The output MUST BE IN ONLY AND ONLY STRING.
 - The output MUST BE IN ONLY AND ONLY STRING.
@@ -145,14 +144,14 @@ TASKS:
 - If the target entity doesn't adhere to the styleguide rules then provide the code strictly adhering to the styleguide rules.
 - If the target entity already adheres to the styleguide rules then tell that it is already following the rules.
 
-EXPECTED OUTPUT: Corrected code of the target entity under section "CORRECTED CODE:"
+EXPECTED OUTPUT: Corrected code of the target entity
 
 RULES:
 - STRICTLY, do not make anything other than the answer to the user's query.
 - Do not provide any kind of diagram or visualization in the output.
-- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
-- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
-- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
 
 STYLEGUIDES:
 ---

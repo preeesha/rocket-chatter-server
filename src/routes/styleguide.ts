@@ -3,7 +3,9 @@ import { STYLEGUIDE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { db } from "../core/neo4j"
 
-export async function __styleguide__(targetEntity: string): Promise<string> {
+export async function __styleguide__(
+	targetEntity: string
+): Promise<Record<string, string>> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -14,7 +16,7 @@ export async function __styleguide__(targetEntity: string): Promise<string> {
 	const styleGuides = dbResults.records.map(
 		(record) => record.get("n").properties
 	)
-	if (!styleGuides.length) return ""
+	if (!styleGuides.length) return { result: "No styleguides found" }
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -28,10 +30,9 @@ export async function __styleguide__(targetEntity: string): Promise<string> {
 			JSON.stringify(styleGuides)
 		).replace("$TARGET_ENTITY", targetEntity)
 	)
-	if (!result) return ""
+	if (!result) return { result: "No result found" }
 
-	const answer = result.split("CORRECTED CODE:\n---\n")[1].trim()
-	return answer
+	return { result }
 }
 
 export async function styleguideRoute(req: Request, res: Response) {
