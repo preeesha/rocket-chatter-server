@@ -18,7 +18,8 @@ export namespace LLM {
 
 	export async function generateOutput(
 		systemPrompt: string,
-		userPrompt: string = ""
+		userPrompt: string = "",
+		userPromptDescriptor: string = "QUERY"
 	): Promise<string | null> {
 		/* OLLAMA BASED LLM USAGE */
 		// const reponse = await ollama.chat({
@@ -37,7 +38,8 @@ export namespace LLM {
 		/* HUGGINGFACE BASED LLM USAGE */
 		try {
 			let inputs = `${systemPrompt}\n`
-			if (userPrompt) inputs += `<QUERY_START>\n${userPrompt}\n<QUERY_END>`
+			if (userPrompt)
+				inputs += `<${userPromptDescriptor}_START>\n${userPrompt}\n<${userPromptDescriptor}_END>`
 			const output = await textGeneration({
 				accessToken: HF_KEY,
 				model: LLM_MODEL,
@@ -47,7 +49,12 @@ export namespace LLM {
 					max_new_tokens: 20_000,
 				},
 			})
-			const content = output.generated_text.split("<QUERY_END>").at(-1).trim()
+			const content = userPrompt
+				? output.generated_text
+				: output.generated_text
+						.split(`<${userPromptDescriptor}_END>`)
+						.at(-1)
+						.trim()
 			return content
 		} catch (e) {
 			console.error(e)

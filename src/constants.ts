@@ -136,13 +136,32 @@ $CODEBASE
 ---
 `
 
-export const DIAGRAM_BASE_PROMPT = `
-you are an expert in understanding and answering questions of user when given a proper context of the codebase.
+export const STYLEGUIDE_BASE_PROMPT = `
+you are an expert in understanding typescript and javascript codebases and adhering to the styleguides.
 
-here's the codebase, based on this solve the user's query by generating a comprehensive and informative diagram:
-THE OUTPUT MUST ONLY BE IN MERMAID FORMAT. THE OUTPUT MUST ONLY BE IN MERMAID FORMAT. THE OUTPUT MUST ONLY BE IN MERMAID FORMAT.
+INPUT: Styleguide rules to enforce on the codebase & the codebase to enforce the rules on.
+
+TASKS:
+- If the target entity doesn't adhere to the styleguide rules then provide the code strictly adhering to the styleguide rules.
+- If the target entity already adheres to the styleguide rules then tell that it is already following the rules.
+
+EXPECTED OUTPUT: Corrected code of the target entity under section "CORRECTED CODE:"
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
+- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
+- The output MUST BE IN ONLY AND ONLY CORRECTED CODE OF THE TARGET ENTITY.
+
+STYLEGUIDES:
 ---
-$CODEBASE
+$STYLEGUIDES
+---
+
+TARGET ENTITY:
+---
+$TARGET_ENTITY
 ---
 `
 

@@ -24,16 +24,24 @@
 
 import { closeDBConnection } from "./core/neo4j"
 import { writeJSON } from "./core/utils"
-import { __translate__ } from "./routes/translate"
+import { __styleguide__ } from "./routes/styleguide"
 
 async function main() {
-	const query = "processOrder"
-	const res = await __translate__(query, "python")
+	const query = `
+	async function __styleguide__() {
+		const user = useUSer()
+		const styleguide = useStyleguides()
+		return {
+			"status": "SUCCESS",
+			"message": "Styleguide generated successfully"
+		}
+	}
+	`
+	const res = await __styleguide__(query)
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")
-	console.log(res.jsdoc)
-	console.log(res.explanation)
+	console.log(res)
 
 	closeDBConnection()
 }
