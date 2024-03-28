@@ -6,11 +6,12 @@ export type DBNode = {
 	kind: string
 	type: string
 
-	text: string
+	code: string
 	comments: string[]
 
 	filePath: string
 	relations: { target: string; relation: DBNodeRelation }[]
 
-	embeddings: number[]
+	nameEmbeddings: number[]
+	codeEmbeddings: number[]
 }

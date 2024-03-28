@@ -21,7 +21,7 @@ namespace Algorithms {
 	}
 
 	export function calculateLinesOfCode(node: DBNode): number {
-		const loc = node.text.split("\n").length
+		const loc = node.code.split("\n").length
 		return loc
 	}
 
