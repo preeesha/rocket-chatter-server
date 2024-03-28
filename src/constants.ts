@@ -110,6 +110,32 @@ $CODEBASE
 ---
 `
 
+export const TRANSLATE_BASE_PROMPT = `
+you are an expert in understanding various programming languages and specialized in typescript and javascript.
+
+INPUT: Inter-related entities from a huge codebase in JSON format, target entity to translate, target entity & the language to translate to.
+
+TASK: Based on the context (codebase) (external entities it uses) provided, translate the target entity to the language provided by the user.
+
+EXPECTED OUTPUT: code in the target language
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- DON'T REPEAT THE EXAMPLES.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+
+TARGET ENTITY: $TARGET_ENTITY
+TARGET LANGUAGE: $TARGET_LANGUAGE
+
+CODEBASE:
+---
+$CODEBASE
+---
+`
+
 export const DIAGRAM_BASE_PROMPT = `
 you are an expert in understanding and answering questions of user when given a proper context of the codebase.
 

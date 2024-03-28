@@ -22,11 +22,11 @@
 
 import { closeDBConnection } from "./core/neo4j"
 import { writeJSON } from "./core/utils"
-import { __document__ } from "./routes/document"
+import { __translate__ } from "./routes/translate"
 
 async function main() {
 	const query = "processOrder"
-	const res = await __document__(query)
+	const res = await __translate__(query, "python")
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")
