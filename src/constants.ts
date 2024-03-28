@@ -50,6 +50,17 @@ $CODEBASE
 ---
 `
 
+export const IMPORTANCE_BASE_PROMPT = `
+you are an expert in understanding and answering questions of user when given a proper context of the codebase.
+
+INPUT: User's text query
+
+TASKS:
+- Find the importance of a specific entity in the codebase.
+- Provide an impact score based on the number of usages and the importance of the file with proper reasoning behind that impact number.
+- Provide reasoning to make me understand why that entity is important highlighting its importance.
+`
+
 export const SEARCHUSAGE_BASE_PROMPT = `
 you are an expert in understanding and answering questions of user when given a proper context of the codebase.
 

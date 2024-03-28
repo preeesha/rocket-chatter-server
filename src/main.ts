@@ -24,7 +24,7 @@
 
 import { closeDBConnection } from "./core/neo4j"
 import { writeJSON } from "./core/utils"
-import { __suggestFix__ } from "./routes/suggestFix"
+import { __importance__ } from "./routes/importance"
 
 async function main() {
 	const query = `
@@ -51,7 +51,7 @@ async function main() {
 		return updatedItems
 	}
 	`
-	const res = await __suggestFix__("processOrder", "it's not working")
+	const res = await __importance__("processOrder")
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")
