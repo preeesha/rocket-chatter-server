@@ -24,34 +24,16 @@
 
 import { closeDBConnection } from "./core/neo4j"
 import { writeJSON } from "./core/utils"
-import { __importance__ } from "./routes/importance"
+import { __findSimilar__ } from "./routes/findSimilar"
 
 async function main() {
 	const query = `
-	function processOrder(
-		items: Item[],
-		orderQuantities: Record<number, number>
-	): Item[] {
-		const updatedItems = items.map((item) => {
-			const orderQuantity = orderQuantities[item.id] || 0
-
-			// Only process if there's an order for this item
-			if (orderQuantity > 0) {
-				try {
-					return updateStockLevel(item, -orderQuantity) // Remove from stock
-				} catch (error) {
-					// You might want more complex error handling, like partial orders
-					return item // Return original item if there's an error
-				}
-			} else {
-				return item
-			}
-		})
-
-		return updatedItems
+	function a() {
+		console.log(s)
+		console.log("b", s)
 	}
 	`
-	const res = await __importance__("processOrder")
+	const res = await __findSimilar__(query)
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")
