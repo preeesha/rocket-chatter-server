@@ -171,10 +171,51 @@ $TARGET_ENTITY
 export const SUGGESTFIX_BASE_PROMPT = `
 you are an expert in understanding typescript and javascript codebases and fixing it provided the context of the codebase.
 
-INPUT: Other entities the target entity is using. The target entity to suggest fixes for.
+INPUT: Other entities the target entity is using. The target entity to suggest fixes for. User's problem statement.
 
 TASKS:
-- Suggest multiple (only if relevany) fixes for the target entity in terms of code, style, best practices, performance, syntax, better alternatives, etc.
+- Suggest multiple (only if relevant) fixes for the target entity in terms of code, style, best practices, performance, syntax, better alternatives, etc.
+- If the target entity is already correct then tell that it is already correct.
+
+EXPECTED OUTPUT: Suggestions for the target entity in form of MARKDOWN and CODE SNIPPET with the fix and explanation.
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+
+<CODEBASE_START>
+$CODEBASE
+<CODEBASE_END>
+
+<USER_QUERY_START>
+$USER_QUERY
+<USER_QUERY_END>
+
+<TARGET_ENTITY_START>
+$TARGET_ENTITY
+<TARGET_ENTITY_END>
+`
+
+export const REFACTOR_BASE_PROMPT = `
+you are an expert in understanding typescript and javascript codebases and fixing it provided the context of the codebase.
+
+INPUT: Other entities the target entity might be using. The target entity to refactor.
+
+TASKS:
+- Refactoring might include:
+   - Renaming
+   - Extracting different parts into separate functions
+   - Making code concise to make it more readable, maintainable
+   - Removing dead code
+   - Performance improvements
+   - Better alternatives
+   - Syntax improvements
+   - Code style improvements
+   - Best practices
+- Suggest multiple (only if relevant) fixes for the target entity.
 - If the target entity is already correct then tell that it is already correct.
 
 EXPECTED OUTPUT: Suggestions for the target entity in form of MARKDOWN and CODE SNIPPET with the fix and explanation.

@@ -51,7 +51,7 @@ async function main() {
 		return updatedItems
 	}
 	`
-	const res = await __suggestFix__(query)
+	const res = await __suggestFix__("processOrder", "it's not working")
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")

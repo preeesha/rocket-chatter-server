@@ -5,7 +5,8 @@ import { Query } from "../core/query"
 import { writeJSON } from "../core/utils"
 
 export async function __suggestFix__(
-	query: string
+	query: string,
+	targetEntity: string
 ): Promise<Record<string, string>> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -34,8 +35,9 @@ export async function __suggestFix__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const answer = await LLM.generateOutput(
-		SUGGESTFIX_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
-		query
+		SUGGESTFIX_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results))
+			.replace("$USER_QUERY", query)
+			.replace("$TARGET_ENTITY", targetEntity)
 	)
 	if (!answer) return { result: "" }
 
@@ -44,8 +46,10 @@ export async function __suggestFix__(
 
 export async function suggestFixRoute(req: Request, res: Response) {
 	const query = req.body.query
+	const targetEntity = req.body.targetEntity
+
 	try {
-		const result = await __suggestFix__(query)
+		const result = await __suggestFix__(query, targetEntity)
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })
