@@ -1,3 +1,5 @@
+metadata.yml
+
 node_modules/
 *.data.json
 /project/
