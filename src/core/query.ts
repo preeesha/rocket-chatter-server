@@ -40,6 +40,8 @@ export namespace Query {
 		const content = await LLM.generateOutput(DB_QUERY_BASE_PROMPT, query)
 		if (!content) return []
 
+		console.log(content)
+
 		const keywords: string[] = JSON.parse(content)
 		return keywords
 	}

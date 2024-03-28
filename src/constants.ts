@@ -19,8 +19,11 @@ export const LLM_MODEL = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 export const DB_QUERY_BASE_PROMPT = `
 you are an expert in understanding and extracting information from the codebase.
-INPUT: User's text query
-EXPECTED OUTPUT: An array of strings containing the key entities from the user's query.
+
+INPUT: In either natural language or code format, the user's query.
+
+OUTPUT: STICTLY, ONLY AN ARRAY OF STRINGS containing the key entities from the user's query.
+
 POSSIBLE ENTITIES: Files, Function, File, Variable, Enum, Class, Type, Interface, Namespace, Member, Import, Module only.
 
 EXAMPLE 1: If the user query is "main.ts file and the message componenet with hello function" then the output should be ["main.ts", "message component", "hello function"].
@@ -121,6 +124,7 @@ EXPECTED OUTPUT: code in the target language not in markdown format.
 
 RULES:
 - STRICTLY, do not make anything other than the answer to the user's query.
+- DO NOT REPEAT THE TRANSLATION MULTIPLE TIMES.
 - Do not provide any kind of diagram or visualization in the output.
 - The output MUST BE IN ONLY AND ONLY STRING.
 - The output MUST BE IN ONLY AND ONLY STRING.
@@ -162,6 +166,33 @@ TARGET ENTITY:
 ---
 $TARGET_ENTITY
 ---
+`
+
+export const SUGGESTFIX_BASE_PROMPT = `
+you are an expert in understanding typescript and javascript codebases and fixing it provided the context of the codebase.
+
+INPUT: Other entities the target entity is using. The target entity to suggest fixes for.
+
+TASKS:
+- Suggest multiple (only if relevany) fixes for the target entity in terms of code, style, best practices, performance, syntax, better alternatives, etc.
+- If the target entity is already correct then tell that it is already correct.
+
+EXPECTED OUTPUT: Suggestions for the target entity in form of MARKDOWN and CODE SNIPPET with the fix and explanation.
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+- The output MUST BE IN ONLY AND ONLY STRING.
+
+<CODEBASE_START>
+$CODEBASE
+<CODEBASE_END>
+
+<TARGET_ENTITY_START>
+$TARGET_ENTITY
+<TARGET_ENTITY_END>
 `
 
 // --------------------------------------------------------------------------------------
