@@ -1,45 +1,59 @@
-// import cors from "cors"
-// import express from "express"
-// import { PORT } from "./constants"
-// import { documentRoute } from "./routes/document"
-// import { healthRoute } from "./routes/health"
-// import { searchUsageRoute } from "./routes/searchUsage"
-// import { summarizeRoute } from "./routes/summarize"
-// import { translateRoute } from "./routes/translate"
+import cors from "cors"
+import express from "express"
+import { PORT } from "./constants"
 
-// const app = express()
-// app.use(express.json())
-// app.use(express.urlencoded({ extended: true }))
-// app.use(cors({ origin: "*" }))
+import { documentRoute } from "./routes/document"
+import { findSimilarRoute } from "./routes/findSimilar"
+import { healthRoute } from "./routes/health"
+import { importanceRoute } from "./routes/importance"
+import { refactorRoute } from "./routes/refactor"
+import { searchUsageRoute } from "./routes/searchUsage"
+import { styleguideRoute } from "./routes/styleguide"
+import { suggestFixRoute } from "./routes/suggestFix"
+import { summarizeRoute } from "./routes/summarize"
+import { testCoverageRoute } from "./routes/testCoverage"
+import { translateRoute } from "./routes/translate"
 
-// app.get("/health", healthRoute)
-// app.post("/summarize", summarizeRoute)
-// app.post("/searchUsage", searchUsageRoute)
-// app.post("/document", documentRoute)
-// app.post("/translate", translateRoute)
+const app = express()
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cors({ origin: "*" }))
 
-// app.listen(PORT, () => {
-// 	console.log(`🚀 Server running on port http://localhost:${PORT}`)
-// })
+app.get("/health", healthRoute)
 
-import { closeDBConnection } from "./core/neo4j"
-import { writeJSON } from "./core/utils"
-import { __findSimilar__ } from "./routes/findSimilar"
+app.post("/document", documentRoute)
+app.post("findSimilar", findSimilarRoute)
+app.post("/importance", importanceRoute)
+app.post("/refactor", refactorRoute)
+app.post("/searchUsage", searchUsageRoute)
+app.post("/styleguide", styleguideRoute)
+app.post("/suggestFix", suggestFixRoute)
+app.post("/summarize", summarizeRoute)
+app.post("/testCoverage", testCoverageRoute)
+app.post("/translate", translateRoute)
 
-async function main() {
-	const query = `
-	function a() {
-		console.log(s)
-		console.log("b", s)
-	}
-	`
-	const res = await __findSimilar__(query)
-	writeJSON("response", res)
+app.listen(PORT, () => {
+	console.log(`🚀 Server running on port http://localhost:${PORT}`)
+})
 
-	console.log("DONE 🚀")
-	console.log(res)
+// import { closeDBConnection } from "./core/neo4j"
+// import { writeJSON } from "./core/utils"
+// import { __findSimilar__ } from "./routes/findSimilar"
 
-	closeDBConnection()
-}
+// async function main() {
+// 	const query = `
+// 	function a() {
+// 		console.log(s)
+// 		console.log("b", s)
+// 	}
+// 	`
+// 	const res = await __findSimilar__(query)
+// 	writeJSON("response", res)
 
-main()
+// 	console.log("DONE 🚀")
+// 	console.log(res)
+
+// 	closeDBConnection()
+// }
+
+// main()
