@@ -11,13 +11,13 @@ export namespace Query {
 			const queryText = await LLM.generateEmbeddings(keyword)
 			const result = await db.run(
 				`
-				CALL db.index.vector.queryNodes("embeddings", 2, $queryText)
-				YIELD node, score
-				WHERE score >= 0.9
-				WITH node
-				MATCH (node)-[r]->(relatedNode)
-				RETURN node, COLLECT(relatedNode) AS relatedNodes
-			`,
+					CALL db.index.vector.queryNodes("embeddings", 2, $queryText)
+					YIELD node, score
+					WHERE score >= 0.9
+					WITH node
+					MATCH (node)-[r]->(relatedNode)
+					RETURN node, COLLECT(relatedNode) AS relatedNodes
+				`,
 				{ queryText: queryText }
 			)
 

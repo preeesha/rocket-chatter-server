@@ -4,7 +4,7 @@ import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 import { writeJSON } from "../core/utils"
 
-export async function resolveQuery(query: string): Promise<string> {
+export async function __summarize__(query: string): Promise<string> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -42,6 +42,6 @@ export async function resolveQuery(query: string): Promise<string> {
 
 export async function summarizeRoute(req: Request, res: Response) {
 	const query = req.body.query
-	const answer = await resolveQuery(query)
+	const answer = await __summarize__(query)
 	res.json({ answer })
 }

@@ -35,7 +35,6 @@ export namespace LLM {
 		// return content
 		//
 		/* HUGGINGFACE BASED LLM USAGE */
-		console.log(`${systemPrompt}\n<QUERY_START>\n${userPrompt}\n<QUERY_END>`)
 		try {
 			const output = await textGeneration({
 				accessToken: HF_KEY,
