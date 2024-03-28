@@ -42,6 +42,10 @@ export async function __summarize__(query: string): Promise<string> {
 
 export async function summarizeRoute(req: Request, res: Response) {
 	const query = req.body.query
-	const answer = await __summarize__(query)
-	res.json({ answer })
+	try {
+		const result = await __summarize__(query)
+		res.status(200).json(result)
+	} catch (error) {
+		res.status(500).json({ status: "ERROR" })
+	}
 }
