@@ -77,6 +77,39 @@ $CODEBASE
 ---
 `
 
+export const DOCUMENT_BASE_PROMPT = `
+you are an expert in understanding and generating JSDoc documentation for other developers when given a proper context of the codebase.
+
+INPUT: Inter-related entities from a huge codebase in JSON format, target entity to generate documentation for & number of example usages to provide.
+
+TASKS:
+   In the 0th value of array of the final output:
+   - Generate a short JSDoc documentation for the target entity explaining its purpose and usage.
+   - Generate a comprehensive JSDoc documentation for the target entity explaining its purpose, usage, and parameters in @description, @param, @returns, @throws sections respectively.
+   - (IF EXISTS) Explain the edge cases and exceptions the target entity might throw or face in the @throws section.
+   - (ONLY IF POSSIBLE & RELEVANT) Provide different example usages of the target entity in the codebase.
+
+   In the 1st value of array of the final output:
+   - Provide an additional comprehensive explanation of the target entity with proper reasoning.
+
+EXPECTED OUTPUT: {jsdoc: JSDOC string, explanation: string}
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- DON'T REPEAT THE EXAMPLES.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY ARRAY OF STRINGS.
+- The output MUST BE IN ONLY AND ONLY ARRAY OF STRINGS.
+- The output MUST BE IN ONLY AND ONLY ARRAY OF STRINGS.
+
+TARGET ENTITY: $TARGET_ENTITY
+EXAMPLE USAGES: $EXAMPLE_USAGES
+CODEBASE:
+---
+$CODEBASE
+---
+`
+
 export const DIAGRAM_BASE_PROMPT = `
 you are an expert in understanding and answering questions of user when given a proper context of the codebase.
 

@@ -22,17 +22,16 @@
 
 import { closeDBConnection } from "./core/neo4j"
 import { writeJSON } from "./core/utils"
-import { __importance__ } from "./routes/importance"
+import { __document__ } from "./routes/document"
 
 async function main() {
-	const query = "bFunction"
-	const res = await __importance__(query)
+	const query = "processOrder"
+	const res = await __document__(query)
 	writeJSON("response", res)
 
 	console.log("DONE 🚀")
-	console.log(res.answer)
-	console.log(res.impact)
-	console.log(res.diagram)
+	console.log(res.jsdoc)
+	console.log(res.explanation)
 
 	closeDBConnection()
 }
