@@ -1,10 +1,11 @@
 // import cors from "cors"
 // import express from "express"
 // import { PORT } from "./constants"
+// import { documentRoute } from "./routes/document"
 // import { healthRoute } from "./routes/health"
-// import { importanceRoute } from "./routes/importance"
 // import { searchUsageRoute } from "./routes/searchUsage"
 // import { summarizeRoute } from "./routes/summarize"
+// import { translateRoute } from "./routes/translate"
 
 // const app = express()
 // app.use(express.json())
@@ -14,7 +15,8 @@
 // app.get("/health", healthRoute)
 // app.post("/summarize", summarizeRoute)
 // app.post("/searchUsage", searchUsageRoute)
-// app.post("/importance", importanceRoute)
+// app.post("/document", documentRoute)
+// app.post("/translate", translateRoute)
 
 // app.listen(PORT, () => {
 // 	console.log(`🚀 Server running on port http://localhost:${PORT}`)
