@@ -44,7 +44,7 @@ async function renderDiagramToBase64URI(diagram: string): Promise<string> {
 		})
 	})
 
-	const uri = `data:image/svg+xml;base64,${base64}`
+	const uri = `data:image/svg+xml;base64,${base64.trim()}`
 
 	return uri
 }

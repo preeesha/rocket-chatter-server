@@ -1,8 +1,9 @@
 // import cors from "cors"
 // import express from "express"
 // import { PORT } from "./constants"
-// import { answerRoute } from "./routes/answer"
 // import { healthRoute } from "./routes/health"
+// import { searchUsageRoute } from "./routes/searchUsage"
+// import { summarizeRoute } from "./routes/summarize"
 
 // const app = express()
 // app.use(express.json())
@@ -10,7 +11,8 @@
 // app.use(cors({ origin: "*" }))
 
 // app.get("/health", healthRoute)
-// app.post("/answer", answerRoute)
+// app.post("/summarize", summarizeRoute)
+// app.post("/searchUsage", searchUsageRoute)
 
 // app.listen(PORT, () => {
 // 	console.log(`🚀 Server running on port http://localhost:${PORT}`)
