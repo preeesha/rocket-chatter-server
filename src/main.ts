@@ -17,7 +17,7 @@ app.listen(PORT, () => {
 })
 
 // import { createInterface } from "readline/promises"
-// import { resolveQuery } from "./core/query"
+// import { resolveQuery } from "./routes/summarize"
 
 // const readline = createInterface({
 // 	input: process.stdin,
@@ -25,10 +25,11 @@ app.listen(PORT, () => {
 // })
 
 // async function main() {
-// 	const query = await readline.question("Enter your query: ")
-// 	const { answer, diagram } = await resolveQuery(query)
+// 	// const query = await readline.question("Enter your query: ")
+// 	const query = "main.ts file and the message componenet with hello function"
+
+// 	const answer = await resolveQuery(query)
 // 	console.log("ANSWER:", answer)
-// 	if (diagram) console.log("DIAGRAM:", diagram)
 // }
 
 // main()
