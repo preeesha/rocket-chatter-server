@@ -22,7 +22,7 @@ app.use(cors({ origin: "*" }))
 app.get("/health", healthRoute)
 
 app.post("/document", documentRoute)
-app.post("findSimilar", findSimilarRoute)
+app.post("/findSimilar", findSimilarRoute)
 app.post("/importance", importanceRoute)
 app.post("/refactor", refactorRoute)
 app.post("/searchUsage", searchUsageRoute)

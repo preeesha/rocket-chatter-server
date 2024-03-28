@@ -5,7 +5,7 @@ import { db } from "../core/neo4j"
 
 export async function __styleguide__(
 	targetEntity: string
-): Promise<Record<string, string>> {
+): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -16,7 +16,7 @@ export async function __styleguide__(
 	const styleGuides = dbResults.records.map(
 		(record) => record.get("n").properties
 	)
-	if (!styleGuides.length) return { result: "No styleguides found" }
+	if (!styleGuides.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ export async function __styleguide__(
 			JSON.stringify(styleGuides)
 		).replace("$TARGET_ENTITY", targetEntity)
 	)
-	if (!result) return { result: "No result found" }
+	if (!result) return null
 
 	return { result }
 }
@@ -40,6 +40,8 @@ export async function styleguideRoute(req: Request, res: Response) {
 
 	try {
 		const result = await __styleguide__(query)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

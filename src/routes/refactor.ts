@@ -4,7 +4,7 @@ import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 import { writeJSON } from "../core/utils"
 
-export async function __refactor__(query: string): Promise<string> {
+export async function __refactor__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -12,7 +12,7 @@ export async function __refactor__(query: string): Promise<string> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const keywords = await Query.getDBKeywordsFromQuery(query)
-	if (!keywords.length) return ""
+	if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ export async function __refactor__(query: string): Promise<string> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
-	if (!results.length) return ""
+	if (!results.length) return null
 
 	writeJSON("results", results)
 
@@ -35,7 +35,7 @@ export async function __refactor__(query: string): Promise<string> {
 		REFACTOR_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
 		query
 	)
-	if (!answer) return ""
+	if (!answer) return null
 
 	return answer
 }

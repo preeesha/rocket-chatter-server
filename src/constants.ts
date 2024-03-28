@@ -72,9 +72,9 @@ TASKS:
 - Also provides an impact score based on the number of usages and the importance of the file with proper reasoning behind that impact number.
 - Provide reasoning to make me understand why that entity is used in the respective usage highlighting its importance.
 - If that entity has no usage in the provided code context then tell him that it's not used anywhere in the codebase.
-- Provide a valid and comprehensive mermaid diagram showing the usages of that entity in the codebase.
+- Provide a valid mermaid diagram showing the ONLY THE DIRECT usages of that entity in the codebase.
 
-EXPECTED OUTPUT: {answer: string, impact: number (out of 10), diagram: string (mermaid format)}
+EXPECTED OUTPUT: {answer: string, impact: number (out of 10), diagram: string (must be a valid mermaid format)}
 
 RULES:
 - STRICTLY, do not make anything other than the answer to the user's query.

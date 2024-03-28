@@ -6,7 +6,7 @@ import { writeJSON } from "../core/utils"
 
 export async function __document__(
 	query: string
-): Promise<Record<string, string>> {
+): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -42,13 +42,16 @@ export async function __document__(
 	if (!result) return {}
 
 	const data = JSON.parse(result)
-	return data
+
+	return { jsDoc: data[0], explaination: data[1] }
 }
 
 export async function documentRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
 		const result = await __document__(query)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

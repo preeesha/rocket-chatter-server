@@ -7,7 +7,7 @@ import { writeJSON } from "../core/utils"
 export async function __translate__(
 	targetEntity: string,
 	targetLanguage: string
-): Promise<Record<string, string>> {
+): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -15,7 +15,7 @@ export async function __translate__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords([targetEntity])
-	if (!codeNodes.length) return { result: "" }
+	if (!codeNodes.length) return null
 
 	writeJSON("results", codeNodes)
 
@@ -31,7 +31,7 @@ export async function __translate__(
 			.replace("$TARGET_LANGUAGE", targetLanguage),
 		""
 	)
-	if (!result) return { result: "" }
+	if (!result) return null
 
 	return { result }
 }
@@ -42,6 +42,8 @@ export async function translateRoute(req: Request, res: Response) {
 
 	try {
 		const result = await __translate__(targetEntity, targetLanguage)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

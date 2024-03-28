@@ -5,19 +5,21 @@ import { DBNode, DBNodeRelation } from "../database/node.types"
 
 namespace Algorithms {
 	function relationCount(node: DBNode, relation: DBNodeRelation): number {
-		const count = node.relations.reduce((acc, rel) => {
-			if (rel.relation === relation) acc++
-			return acc
-		}, 0)
-		return count
+		return 0
+		// const count = node.relations.reduce((acc, rel) => {
+		// 	if (rel.relation === relation) acc++
+		// 	return acc
+		// }, 0)
+		// return count
 	}
 
 	export function calculateFrequencyOfUse(nodes: DBNode[]): number {
-		const frequency = nodes.reduce((acc, node) => {
-			acc += node.relations.length
-			return acc
-		}, 0)
-		return frequency
+		return 0
+		// const frequency = nodes.reduce((acc, node) => {
+		// 	acc += node.relations.length
+		// 	return acc
+		// }, 0)
+		// return frequency
 	}
 
 	export function calculateLinesOfCode(node: DBNode): number {
@@ -42,7 +44,7 @@ namespace Algorithms {
 
 export async function __importance__(
 	query: string
-): Promise<Record<string, number>> {
+): Promise<Record<string, number> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -50,7 +52,7 @@ export async function __importance__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const keywords = await Query.getDBKeywordsFromQuery(query)
-	if (!keywords.length) return {}
+	if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -59,7 +61,7 @@ export async function __importance__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
-	if (!codeNodes.length) return {}
+	if (!codeNodes.length) return null
 
 	writeJSON("results", codeNodes)
 
@@ -87,8 +89,11 @@ export async function importanceRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
 		const result = await __importance__(query)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
+		console.log(error)
 		res.status(500).json({ status: "ERROR" })
 	}
 }

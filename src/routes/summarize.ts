@@ -4,7 +4,7 @@ import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 import { writeJSON } from "../core/utils"
 
-export async function __summarize__(query: string): Promise<string> {
+export async function __summarize__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -12,7 +12,7 @@ export async function __summarize__(query: string): Promise<string> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const keywords = await Query.getDBKeywordsFromQuery(query)
-	if (!keywords.length) return ""
+	if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ export async function __summarize__(query: string): Promise<string> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
-	if (!results.length) return ""
+	if (!results.length) return null
 
 	writeJSON("results", results)
 
@@ -35,7 +35,7 @@ export async function __summarize__(query: string): Promise<string> {
 		SUMMARIZE_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
 		query
 	)
-	if (!answer) return ""
+	if (!answer) return null
 
 	return answer
 }
@@ -44,6 +44,8 @@ export async function summarizeRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
 		const result = await __summarize__(query)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

@@ -7,7 +7,7 @@ import { writeJSON } from "../core/utils"
 export async function __suggestFix__(
 	query: string,
 	targetEntity: string
-): Promise<Record<string, string>> {
+): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -15,7 +15,7 @@ export async function __suggestFix__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const keywords = await Query.getDBKeywordsFromQuery(query)
-	if (!keywords.length) return { result: "" }
+	if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ export async function __suggestFix__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
-	if (!results.length) return { result: "" }
+	if (!results.length) return null
 
 	writeJSON("results", results)
 
@@ -39,7 +39,7 @@ export async function __suggestFix__(
 			.replace("$USER_QUERY", query)
 			.replace("$TARGET_ENTITY", targetEntity)
 	)
-	if (!answer) return { result: "" }
+	if (!answer) return null
 
 	return { result: answer }
 }
@@ -50,6 +50,8 @@ export async function suggestFixRoute(req: Request, res: Response) {
 
 	try {
 		const result = await __suggestFix__(query, targetEntity)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

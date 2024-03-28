@@ -18,6 +18,7 @@ async function renderDiagramToBase64URI(diagram: string): Promise<string> {
 	writeFileSync(diagramMDFileName, diagram)
 
 	await new Promise<void>((resolve, reject) => {
+		console.log(`npx mmdc -i ${diagramMDFileName} -o ${diagramSVGFileName}`)
 		const diagram = exec(
 			`npx mmdc -i ${diagramMDFileName} -o ${diagramSVGFileName}`,
 			{
@@ -31,6 +32,7 @@ async function renderDiagramToBase64URI(diagram: string): Promise<string> {
 			if (code === 0) {
 				resolve()
 			} else {
+				console.log(`Error: ${code}`)
 				reject()
 			}
 		})
@@ -104,6 +106,7 @@ export async function searchUsageRoute(req: Request, res: Response) {
 		const result = await __searchUsage__(query)
 		res.status(200).json(result)
 	} catch (error) {
+		console.log(error)
 		res.status(500).json({ status: "ERROR" })
 	}
 }
