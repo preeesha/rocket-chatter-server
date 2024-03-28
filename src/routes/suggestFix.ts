@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { SUGGESTFIX_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 export async function __suggestFix__(
 	query: string,
@@ -25,8 +24,6 @@ export async function __suggestFix__(
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
 	if (!results.length) return null
-
-	writeJSON("results", results)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

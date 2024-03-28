@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 import { DBNode, DBNodeRelation } from "../database/node.types"
 
 namespace Algorithms {
@@ -62,8 +61,6 @@ export async function __importance__(
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
 	if (!codeNodes.length) return null
-
-	writeJSON("results", codeNodes)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

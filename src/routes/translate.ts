@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { TRANSLATE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 export async function __translate__(
 	targetEntity: string,
@@ -16,8 +15,6 @@ export async function __translate__(
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords([targetEntity])
 	if (!codeNodes.length) return null
-
-	writeJSON("results", codeNodes)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { REFACTOR_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 export async function __refactor__(query: string): Promise<string | null> {
 	/**
@@ -22,8 +21,6 @@ export async function __refactor__(query: string): Promise<string | null> {
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
 	if (!results.length) return null
-
-	writeJSON("results", results)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

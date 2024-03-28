@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { SEARCHUSAGE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 import { exec } from "child_process"
 import { randomUUID } from "crypto"
@@ -71,8 +70,6 @@ export async function __searchUsage__(
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
 	if (!codeNodes.length) return {}
-
-	writeJSON("results", codeNodes)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

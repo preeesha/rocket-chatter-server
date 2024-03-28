@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { DOCUMENT_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 export async function __document__(
 	query: string
@@ -24,8 +23,6 @@ export async function __document__(
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords([keyword])
 	if (!codeNodes.length) return {}
-
-	writeJSON("results", codeNodes)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------

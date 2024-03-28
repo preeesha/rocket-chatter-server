@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { SUMMARIZE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-import { writeJSON } from "../core/utils"
 
 export async function __summarize__(query: string): Promise<string | null> {
 	/**
@@ -12,6 +11,7 @@ export async function __summarize__(query: string): Promise<string | null> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const keywords = await Query.getDBKeywordsFromQuery(query)
+	console.log("KEYWORDS", keywords)
 	if (!keywords.length) return null
 
 	/**
@@ -21,9 +21,8 @@ export async function __summarize__(query: string): Promise<string | null> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const results = await Query.getCodeNodesFromKeywords(keywords)
+	console.log("RESULTS", results)
 	if (!results.length) return null
-
-	writeJSON("results", results)
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -35,6 +34,7 @@ export async function __summarize__(query: string): Promise<string | null> {
 		SUMMARIZE_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
 		query
 	)
+	console.log("ANSWER", answer)
 	if (!answer) return null
 
 	return answer
@@ -48,6 +48,7 @@ export async function summarizeRoute(req: Request, res: Response) {
 
 		res.status(200).json(result)
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ status: "ERROR" })
 	}
 }
