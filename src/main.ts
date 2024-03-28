@@ -17,13 +17,18 @@
 // })
 
 import { closeDBConnection } from "./core/neo4j"
-import { __summarize__ } from "./routes/summarize"
+import { writeJSON } from "./core/utils"
+import { __searchUsage__ } from "./routes/searchUsage"
 
 async function main() {
-	// const query = await readline.question("Enter your query: ")
-	const query = "What's DBNode and where it's used? and why?"
-	const answer = await __summarize__(query)
-	console.log("ANSWER:", answer)
+	const query = "bFunction"
+	const res = await __searchUsage__(query)
+	writeJSON("response", res)
+
+	console.log("DONE 🚀")
+	console.log(res.answer)
+	console.log(res.impact)
+	console.log(res.diagram)
 
 	closeDBConnection()
 }

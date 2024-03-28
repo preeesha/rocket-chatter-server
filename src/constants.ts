@@ -27,11 +27,9 @@ EXAMPLE 1: If the user query is "main.ts file and the message componenet with he
 EXAMPLE 2: If the user query is "i don't understand the purpose of the 'utils' module" then the output should be ["utils"].
 EXAMPLE 3: If the user query is "what is the 'message' component doing in the 'main.ts' file" then the output should be ["message", "main.ts"].
 
-NOTE:
+RULES:
 - The entities must be extracted as they are mentioned in the user's query.
 - You can correct the names of the provided entities according to the programming vocabulary only if you think it might be wrong otherwise leave it as it is.
-- The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS.
-- The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS.
 - The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS. LITERALLY NOTHING ELSE.
 `
 
@@ -43,6 +41,37 @@ export const SUMMARIZE_BASE_PROMPT = `
 you are an expert in understanding and answering questions of user when given a proper context of the codebase.
 even if user asks for any kind of diagram or visualization, you must ignore that and just provide the answer to the user's query.
 here's the codebase, based on this solve the user's query:
+
+---
+$CODEBASE
+---
+`
+
+export const SEARCHUSAGE_BASE_PROMPT = `
+you are an expert in understanding and answering questions of user when given a proper context of the codebase.
+
+INPUT: User's text query
+
+TASKS:
+- Finds where a specific function or class is used throughout the codebase.
+- Helps map out dependencies.
+- Also provides an impact score based on the number of usages and the importance of the file with proper reasoning behind that impact number.
+- Provide reasoning to make me understand why that entity is used in the respective usage highlighting its importance.
+- If that entity has no usage in the provided code context then tell him that it's not used anywhere in the codebase.
+- Provide a valid and comprehensive mermaid diagram showing the usages of that entity in the codebase.
+
+EXPECTED OUTPUT: {answer: string, impact: number (out of 10), diagram: string (mermaid format)}
+
+RULES:
+- STRICTLY, do not make anything other than the answer to the user's query.
+- Don't tell me how to use that entity in the codebase.
+- If that entity is used multiple times then provide the reasoning for each usage separately.
+- DON'T REPEAT THE USAGES OF THE ENTITY MULTIPLE TIMES.
+- Do not provide any kind of diagram or visualization in the output.
+- The output MUST BE IN ONLY AND ONLY JSON.
+- The output MUST BE IN ONLY AND ONLY JSON.
+- The output MUST BE IN ONLY AND ONLY JSON.
+
 ---
 $CODEBASE
 ---
