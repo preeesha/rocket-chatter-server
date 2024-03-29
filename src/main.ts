@@ -3,6 +3,7 @@ import express from "express"
 import { PORT } from "./constants"
 
 import { askRoute } from "./routes/ask"
+import { diagramRoute } from "./routes/diagram"
 import { documentRoute } from "./routes/document"
 import { findSimilarRoute } from "./routes/findSimilar"
 import { healthRoute } from "./routes/health"
@@ -21,6 +22,8 @@ app.use(cors({ origin: "*" }))
 
 app.get("/health", healthRoute)
 
+app.post("/ask", askRoute)
+app.post("/diagram", diagramRoute)
 app.post("/document", documentRoute)
 app.post("/findSimilar", findSimilarRoute)
 app.post("/importance", importanceRoute)
@@ -28,7 +31,6 @@ app.post("/refactor", refactorRoute)
 app.post("/searchUsage", searchUsageRoute)
 app.post("/styleguide", styleguideRoute)
 app.post("/suggestFix", suggestFixRoute)
-app.post("/ask", askRoute)
 app.post("/testCoverage", testCoverageRoute)
 app.post("/translate", translateRoute)
 

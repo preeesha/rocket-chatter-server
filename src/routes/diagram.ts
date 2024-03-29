@@ -1,9 +1,10 @@
 import { Request, Response } from "express"
-import { ASK_BASE_PROMPT } from "../constants"
+import { DIAGRAM_BASE_PROMPT } from "../constants"
+import { renderDiagramToBase64URI } from "../core/diagram"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 
-export async function __ask__(query: string): Promise<string | null> {
+export async function __diagram__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -27,23 +28,24 @@ export async function __ask__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 3:
-	 * Generate the answer and diagram for the user's query given the nodes data
+	 * Generate the diagram code and diagram for the user's query given the nodes data
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	const answer = await LLM.generateOutput(
-		ASK_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
+	const diagram = await LLM.generateOutput(
+		DIAGRAM_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
 		query
 	)
-	console.log("ANSWER", answer)
-	if (!answer) return null
+	console.log("ANSWER:\n", diagram)
+	if (!diagram) return null
 
-	return answer
+	const base64Diagram = await renderDiagramToBase64URI(diagram)
+	return base64Diagram
 }
 
-export async function askRoute(req: Request, res: Response) {
+export async function diagramRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
-		const result = await __ask__(query)
+		const result = await __diagram__(query)
 		if (!result) return res.status(400).json({ status: "ERROR" })
 
 		res.status(200).json(result)

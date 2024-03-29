@@ -1,54 +1,8 @@
 import { Request, Response } from "express"
 import { SEARCHUSAGE_BASE_PROMPT } from "../constants"
+import { renderDiagramToBase64URI } from "../core/diagram"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
-
-import { exec } from "child_process"
-import { randomUUID } from "crypto"
-import { writeFileSync } from "fs"
-import { unlink } from "fs/promises"
-
-async function renderDiagramToBase64URI(diagram: string): Promise<string> {
-	const diagramID = randomUUID()
-	const diagramMDFileName = `${diagramID}.md`
-	const diagramSVGFileName = `${diagramID}.svg`
-	const diagramSVGOutputFileName = `${diagramID}-1.svg`
-
-	writeFileSync(diagramMDFileName, diagram)
-
-	await new Promise<void>((resolve, reject) => {
-		console.log(`npx mmdc -i ${diagramMDFileName} -o ${diagramSVGFileName}`)
-		const diagram = exec(
-			`npx mmdc -i ${diagramMDFileName} -o ${diagramSVGFileName}`,
-			{
-				cwd: process.cwd(),
-				timeout: 10000,
-			}
-		)
-
-		diagram.on("exit", async (code) => {
-			await unlink(diagramMDFileName)
-			if (code === 0) {
-				resolve()
-			} else {
-				console.log(`Error: ${code}`)
-				reject()
-			}
-		})
-	})
-
-	const base64 = await new Promise<string>((resolve, reject) => {
-		exec(`base64 ${diagramSVGOutputFileName}`, async (err, stdout) => {
-			await unlink(diagramSVGOutputFileName)
-			if (err) reject(err)
-			resolve(stdout)
-		})
-	})
-
-	const uri = `data:image/svg+xml;base64,${base64.trim()}`
-
-	return uri
-}
 
 export async function __searchUsage__(
 	query: string
