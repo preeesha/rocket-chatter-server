@@ -32,6 +32,8 @@ app.post("/summarize", summarizeRoute)
 app.post("/testCoverage", testCoverageRoute)
 app.post("/translate", translateRoute)
 
+console.clear()
+
 app.listen(PORT, () => {
 	console.log(`🚀 Server running on port http://localhost:${PORT}`)
 })

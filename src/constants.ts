@@ -106,7 +106,7 @@ TASKS:
    In the 1st value of array of the final output:
    - Provide an additional comprehensive explanation of the target entity with proper reasoning.
 
-EXPECTED OUTPUT: {jsdoc: JSDOC string, explanation: string}
+EXPECTED OUTPUT: A single 1D array containing 2 strings. 0th value is the JSDoc documentation and 1st value is the additional explanation. It must be a valid JSON.
 
 RULES:
 - STRICTLY, do not make anything other than the answer to the user's query.
