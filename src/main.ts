@@ -2,6 +2,7 @@ import cors from "cors"
 import express from "express"
 import { PORT } from "./constants"
 
+import { askRoute } from "./routes/ask"
 import { documentRoute } from "./routes/document"
 import { findSimilarRoute } from "./routes/findSimilar"
 import { healthRoute } from "./routes/health"
@@ -10,7 +11,6 @@ import { refactorRoute } from "./routes/refactor"
 import { searchUsageRoute } from "./routes/searchUsage"
 import { styleguideRoute } from "./routes/styleguide"
 import { suggestFixRoute } from "./routes/suggestFix"
-import { summarizeRoute } from "./routes/summarize"
 import { testCoverageRoute } from "./routes/testCoverage"
 import { translateRoute } from "./routes/translate"
 
@@ -28,7 +28,7 @@ app.post("/refactor", refactorRoute)
 app.post("/searchUsage", searchUsageRoute)
 app.post("/styleguide", styleguideRoute)
 app.post("/suggestFix", suggestFixRoute)
-app.post("/summarize", summarizeRoute)
+app.post("/ask", askRoute)
 app.post("/testCoverage", testCoverageRoute)
 app.post("/translate", translateRoute)
 

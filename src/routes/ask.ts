@@ -3,7 +3,7 @@ import { SUMMARIZE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 
-export async function __summarize__(query: string): Promise<string | null> {
+export async function __ask__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -40,15 +40,15 @@ export async function __summarize__(query: string): Promise<string | null> {
 	return answer
 }
 
-export async function summarizeRoute(req: Request, res: Response) {
+export async function askRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
-		const result = await __summarize__(query)
+		const result = await __ask__(query)
 		if (!result) return res.status(400).json({ status: "ERROR" })
 
 		res.status(200).json(result)
 	} catch (error) {
-		console.log(error);
+		console.log(error)
 		res.status(500).json({ status: "ERROR" })
 	}
 }

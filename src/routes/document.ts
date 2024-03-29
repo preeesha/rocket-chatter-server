@@ -35,7 +35,6 @@ export async function __document__(
 	writeFileSync("document.json", result)
 
 	const data = JSON.parse(result)
-	console.log(data)
 
 	return { jsDoc: data[0], explanation: data[1] }
 }
