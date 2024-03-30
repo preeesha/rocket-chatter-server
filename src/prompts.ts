@@ -161,7 +161,7 @@ export namespace Prompts {
 				},
 				{ role: "user", content: query },
 			],
-			'<ANSWER_START>\n["'
+			"<ANSWER_START>\n<JSDOC>"
 		)
 	}
 
@@ -231,7 +231,10 @@ export namespace Prompts {
             - If the codebase doesn't adhere to the styleguide rules then provide the code strictly adhering to the styleguide rules.
             - If the codebase already adheres to the styleguide rules then tell that it is already following the rules.
 
-            EXPECTED OUTPUT: Corrected code of the codebase
+            EXPECTED OUTPUT:
+				<ANSWER>
+					- Provide the codebase strictly adhering to the styleguide rules.
+				</ANSWER>
 
             RULES:
             - STRICTLY, do not make anything other than the answer to the user's query.

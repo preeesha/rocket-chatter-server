@@ -36,6 +36,8 @@ export async function __document__(
 	)
 	if (!result) return null
 
+	console.log(result)
+
 	const answer = result
 		.split("<ANSWER_START>")[1]
 		.split("<ANSWER_END>")[0]
@@ -46,6 +48,9 @@ export async function __document__(
 		.split("<EXPLANATION>")[1]
 		.split("</EXPLANATION>")[0]
 		.trim()
+
+	console.log(jsDoc)
+	console.log(explanation)
 
 	return { jsDoc: jsDoc, explanation: explanation }
 }

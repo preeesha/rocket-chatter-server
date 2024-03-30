@@ -5,7 +5,7 @@ import { Prompts } from "../prompts"
 
 export async function __styleguide__(
 	targetEntity: string
-): Promise<Record<string, string> | null> {
+): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -29,7 +29,9 @@ export async function __styleguide__(
 	)
 	if (!result) return null
 
-	return { result }
+	const answer = result.split("<ANSWER>")[1].split("</ANSWER>")[0].trim()
+
+	return answer
 }
 
 export async function styleguideRoute(req: Request, res: Response) {
