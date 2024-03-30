@@ -27,16 +27,15 @@ app.post("/diagram", diagramRoute)
 app.post("/document", documentRoute)
 app.post("/findSimilar", findSimilarRoute)
 app.post("/importance", importanceRoute)
-app.post("/refactor", refactorRoute)
+app.post("/refactor", refactorRoute) //
 app.post("/searchUsage", searchUsageRoute)
-app.post("/styleguide", styleguideRoute)
+app.post("/styleguide", styleguideRoute) //
 app.post("/suggestFix", suggestFixRoute)
 app.post("/testCoverage", testCoverageRoute)
 app.post("/translate", translateRoute)
 
-console.clear()
-
 app.listen(PORT, () => {
+	console.clear()
 	console.log(`🚀 Server running on port http://localhost:${PORT}`)
 })
 
