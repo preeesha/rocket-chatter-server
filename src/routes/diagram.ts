@@ -34,10 +34,17 @@ export async function __diagram__(query: string): Promise<string | null> {
 	const diagram = await LLM.generateOutput(
 		Prompts.makeDiagramPrompt(JSON.stringify(results), query)
 	)
-	console.log("ANSWER:\n", diagram)
 	if (!diagram) return null
 
-	const base64Diagram = await renderDiagramToBase64URI(diagram)
+	console.log(diagram);
+
+	const diagramContent = diagram
+		.split("<DIAGRAM_START>")[1]
+		.split("<DIAGRAM_END>")[0]
+		.trim()
+	console.log("DIAGRAM:\n", diagramContent)
+
+	const base64Diagram = await renderDiagramToBase64URI(diagramContent)
 	return base64Diagram
 }
 

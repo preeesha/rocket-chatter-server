@@ -15,7 +15,8 @@ export class Prompt {
 
 	/* TODO: Add format checking or use langchain */
 	make(
-		messages: { role: "system" | "assistant" | "user"; content: string }[]
+		messages: { role: "system" | "assistant" | "user"; content: string }[],
+		delimiter: string = ""
 	): string {
 		let prompt = "<s>\n"
 		prompt += `\t[INST]\n\t\t${this.systemPrompt}\n\t[/INST]\n\t`
@@ -34,13 +35,13 @@ export class Prompt {
 			prompt += `\n\t${nextMessage.content}`
 			prompt += "\n</s>\n"
 		}
-		prompt += " Assistant:"
+		prompt += " Assistant:\n" + delimiter
 
 		return prompt
 	}
 
 	static processOutput(output: string): string {
-		return (output.split("[/INST] Assistant:").at(-1) ?? "").trim()
+		return (output.split("[/INST] Assistant:\n").at(-1) ?? "").trim()
 	}
 }
 

@@ -12,7 +12,7 @@ export namespace Prompts {
 				- Extract the possible keywords from the user's query.
 				- Query the database to find the nodes names of which are similar to what user has requested.
 
-				EXPECTED OUTPUT: An array of nodes from the codebase.
+				EXPECTED OUTPUT: Only An array of nodes from the codebase.
 
 				RULES:
 				- STRICTLY, do not make anything other than the answer to the user's query.
@@ -20,10 +20,35 @@ export namespace Prompts {
 				- Do not provide any kind of diagram or visualization in the output.
 				- The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS.
 			`,
-			"Sure, I will strictly follow my instructions. I will only provide the answer in JSON format."
+			"Sure, I will strictly follow my instructions. I will provide the answer in ONLY ARRAY OF STRINGS."
 		)
 
-		return prompt.make([{ role: "user", content: query }])
+		return prompt.make([
+			{
+				role: "system",
+				content: "You must output only in the form of an array of strings.",
+			},
+			{
+				role: "assistant",
+				content:
+					"Sure, I will strictly follow my instructions. I will provide the answer in ONLY ARRAY OF STRINGS.",
+			},
+			{
+				role: "system",
+				content: `
+					Here's the user query:
+					<QUERY_START>
+						${query}
+					<QUERY_END>
+				`,
+			},
+			{
+				role: "assistant",
+				content:
+					"Yeah sure. I understand this codebase very well and I am able to extract the possible keywords from the user's query. If I can't find the keywords, I'll return an empty array.",
+			},
+			{ role: "user", content: query },
+		])
 	}
 
 	export function makeAskPrompt(codebase: string, query: string): string {
@@ -62,29 +87,32 @@ export namespace Prompts {
 		const prompt = new Prompt(
 			`
             You are an expert in understanding and answering questions of user when given a proper context of the codebase. Here're the rules:
-            1. You only provide diagram or visualization in the mermaid 8.13.1 format.
-            2. The output must be a markdown file only with the mermaid code.
+            1. You only provide diagram or visualization in the Graphviz format.
+				2. The output must be a valid PLAIN TEXT only.
          `,
-			"Sure, I will strictly follow my instructions. I will only provide the answer in mermaid 8.13.1 format."
+			"Sure, I will strictly follow my instructions. I will provide the answer in a valid PLAIN TEXT only. Don't expalin anything."
 		)
 
-		return prompt.make([
-			{
-				role: "system",
-				content: `
+		return prompt.make(
+			[
+				{
+					role: "system",
+					content: `
                HERE'RE THE NODES OF THE CODEBASE TO USE AS CONTEXT:
                <CODEBASE_START>
                   ${codebase}
                </CODEBASE_END>
             `,
-			},
-			{
-				role: "assistant",
-				content:
-					"Yeah sure. I understand this codebase very well and I am able to write mermaid diagram only from the above codebase. If I don't know the answer, I'll tell it to you.",
-			},
-			{ role: "user", content: query },
-		])
+				},
+				{
+					role: "assistant",
+					content:
+						"Yeah sure. I'll start my response with <DIAGRAM_START> and end with <DIAGRAM_END>. I will only provide the answer in a valid PLAIN TEXT only. Don't expalin anything.",
+				},
+				{ role: "user", content: query },
+			],
+			"<DIAGRAM_START>"
+		)
 	}
 
 	export function makeDocumentPrompt(codebase: string, query: string): string {
