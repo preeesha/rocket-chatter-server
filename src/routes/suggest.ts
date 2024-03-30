@@ -3,9 +3,7 @@ import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 import { Prompts } from "../prompts"
 
-export async function __suggest__(
-	query: string
-): Promise<Record<string, string> | null> {
+export async function __suggest__(query: string): Promise<string | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -35,7 +33,7 @@ export async function __suggest__(
 	)
 	if (!answer) return null
 
-	return { result: answer }
+	return answer
 }
 
 export async function suggestRoute(req: Request, res: Response) {
