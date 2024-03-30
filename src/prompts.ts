@@ -175,27 +175,28 @@ export namespace Prompts {
 
             INPUT: User's text query
 
-            TASKS:
-            - Finds where a specific function or class is used throughout the codebase.
-            - Helps map out dependencies.
-            - Also provides an impact score based on the number of usages and the importance of the file with proper reasoning behind that impact number.
-            - Provide reasoning to make me understand why that entity is used in the respective usage highlighting its importance.
-            - If that entity has no usage in the provided code context then tell him that it's not used anywhere in the codebase.
-            - Provide a valid mermaid diagram showing the ONLY THE DIRECT usages of that entity in the codebase.
-
-            EXPECTED OUTPUT: {answer: string, impact: number (out of 10), diagram: string (must be a valid mermaid format)}
+            EXPECTED OUTPUT:
+				<ANSWER>
+					<EXPLANATION>
+						- Provide an additional comprehensive explanation of the target entity with proper reasoning.
+					</EXPLANATION>
+					<IMPACT>
+						- Provide the impact score of the target entity based on the number of usages and the importance of the file.
+					</IMPACT>
+					<DIAGRAM>
+						- Provide a clear and consize graphviz diagram showing the direct usages of that entity in the codebase. Make it as simple as possible but don't miss any important information.
+						- Without saying anything, provide the diagram. Don't include the symbol \`\`\` anywhere in the diagram.
+					</DIAGRAM>
+				</ANSWER>
 
             RULES:
             - STRICTLY, do not make anything other than the answer to the user's query.
             - Don't tell me how to use that entity in the codebase.
             - If that entity is used multiple times then provide the reasoning for each usage separately.
             - DON'T REPEAT THE USAGES OF THE ENTITY MULTIPLE TIMES.
-            - Do not provide any kind of diagram or visualization in the output.
-            - The output MUST BE IN ONLY AND ONLY JSON.
-            - The output MUST BE IN ONLY AND ONLY JSON.
-            - The output MUST BE IN ONLY AND ONLY JSON.
+            - The output MUST BE IN ONLY AND ONLY IN THE ABOVE SPECIFIED FORMAT.
          `,
-			"Sure, I will strictly follow my instructions. I will only provide the answer in JSON format."
+			"Sure, I will strictly follow my instructions. I will only provide the answer in the above specified format only."
 		)
 
 		return prompt.make([
@@ -210,8 +211,7 @@ export namespace Prompts {
 			},
 			{
 				role: "assistant",
-				content:
-					"Yeah sure. I understand this codebase very well and I am able to answer questions only from the above codebase. If I don't know the answer, I'll tell it to you.",
+				content: "Yeah sure. If I don't know the answer, I'll tell it to you.",
 			},
 			{ role: "user", content: query },
 		])

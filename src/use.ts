@@ -1,4 +1,4 @@
-import { __document__ } from "./routes/document"
+import { __searchUsage__ } from "./routes/searchUsage"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,9 +16,7 @@ def main():
 `
 
 async function main() {
-	const result = await __document__(
-		"I don't understand the working of YallistNode"
-	)
+	const result = await __searchUsage__("YallistNode")
 	// console.clear()
 	console.log(result)
 }

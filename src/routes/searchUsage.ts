@@ -36,7 +36,12 @@ export async function __searchUsage__(
 	)
 	if (!result) return {}
 
-	const data = JSON.parse(result)
+	const impact = result.split("<IMPACT>")[1].split("</IMPACT>")[0].trim()
+	const explanation = result
+		.split("<EXPLANATION>")[1]
+		.split("</EXPLANATION>")[0]
+		.trim()
+	const diagram = result.split("<DIAGRAM>")[1].split("</DIAGRAM>")[0].trim()
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -44,9 +49,10 @@ export async function __searchUsage__(
 	 * Generate the diagram for the user's query given the nodes data
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	if (!data.diagram) return data
-	data.diagram = await renderDiagramToBase64URI(data.diagram)
+	if (!diagram) return { impact, explanation, diagram: "" }
+	const renderedDiagram = await renderDiagramToBase64URI(diagram)
 
+	const data = { impact, explanation, diagram: renderedDiagram }
 	return data
 }
 
