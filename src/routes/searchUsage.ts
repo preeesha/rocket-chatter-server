@@ -49,10 +49,15 @@ export async function __searchUsage__(
 	 * Generate the diagram for the user's query given the nodes data
 	 * ---------------------------------------------------------------------------------------------
 	 */
+	const data = { impact, explanation, diagram: "" }
 	if (!diagram) return { impact, explanation, diagram: "" }
-	const renderedDiagram = await renderDiagramToBase64URI(diagram)
 
-	const data = { impact, explanation, diagram: renderedDiagram }
+	if (diagram) {
+		try {
+			data.diagram = await renderDiagramToBase64URI(diagram)
+		} catch {}
+	}
+
 	return data
 }
 
