@@ -59,9 +59,21 @@ export namespace Query {
 		)
 		if (!content) return []
 
-		const array = content.split("<ANSWER>")[1].split("</ANSWER>")[0]
+		console.log(content)
 
-		const keywords: string[] = JSON.parse(array)
+		const keywords = content
+			.split("<ANSWER>")[1]
+			.split("</ANSWER>")[0]
+			.split(",")
+			.map((x) => x.trim())
+			.map((x) => {
+				if (x.startsWith('"') && x.endsWith('"')) {
+					return x.slice(1, -1)
+				}
+				return x
+			})
+		console.log(keywords)
+
 		return keywords
 	}
 }

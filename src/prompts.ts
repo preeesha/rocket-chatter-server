@@ -9,19 +9,28 @@ export namespace Prompts {
 				INPUT: User's text query in either natural language or code format.
 
 				TASKS:
+				- NEVER USE backslash in any of the keywords even if it's part of the query.
 				- Extract the possible keywords from the user's query.
 				- Query the database to find the nodes names of which are similar to what user has requested.
+				- If you are unable to extract the keywords, return an empty array.
+				- EXTRACT THE KEYWORDS IN SUCH A WAY THAT EACH STRING AS ONE WORD ELEMENT ONLY.
 
-				EXPECTED OUTPUT:
+				EXAMPLE:
+				- INPUT:
+					"Find the codebase for the user query CRC_TABLE in the main.ts'
+				- OUTPUT:
+					<ANSWER>
+						CRC_TABLE, main.ts
+					</ANSWER>
+
+				OUTPUT:
 				<ANSWER>
-					- Provide the possible keywords extracted from the user's query.
+					- Provide the possible keywords extracted from the user's query in a comma-separated format (unquoted).
 				</ANSWER>
 
 				RULES:
+				- DO NOT REPEAT THE KEYWORDS MULTIPLE TIMES.
 				- STRICTLY, do not make anything other than the answer to the user's query.
-				- DO NOT REPEAT THE NODES MULTIPLE TIMES.
-				- Do not provide any kind of diagram or visualization in the output.
-				- The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS.
 			`,
 			"Sure, I will strictly follow my instructions. I will provide the answer the above specified format only."
 		)
@@ -44,7 +53,7 @@ export namespace Prompts {
 				},
 				{ role: "user", content: query },
 			],
-			`<ANSWER>["`
+			`<ANSWER>"`
 		)
 	}
 
