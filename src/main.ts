@@ -8,10 +8,10 @@ import { documentRoute } from "./routes/document"
 import { findSimilarRoute } from "./routes/findSimilar"
 import { healthRoute } from "./routes/health"
 import { importanceRoute } from "./routes/importance"
-import { searchUsageRoute } from "./routes/searchUsage"
 import { styleguideRoute } from "./routes/styleguide"
 import { suggestRoute } from "./routes/suggest"
 import { translateRoute } from "./routes/translate"
+import { whyUsedRoute } from "./routes/whyUsed"
 
 const app = express()
 app.use(express.json())
@@ -25,7 +25,7 @@ app.post("/diagram", diagramRoute)
 app.post("/document", documentRoute)
 app.post("/findSimilar", findSimilarRoute)
 app.post("/importance", importanceRoute)
-app.post("/searchUsage", searchUsageRoute)
+app.post("/whyUsed", whyUsedRoute)
 app.post("/styleguide", styleguideRoute) //
 app.post("/suggest", suggestRoute)
 app.post("/translate", translateRoute)

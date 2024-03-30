@@ -4,7 +4,7 @@ import { LLM } from "../core/llm"
 import { Query } from "../core/query"
 import { Prompts } from "../prompts"
 
-export async function __searchUsage__(
+export async function __whyUsed__(
 	query: string
 ): Promise<Record<string, string>> {
 	/**
@@ -32,7 +32,7 @@ export async function __searchUsage__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const result = await LLM.generateOutput(
-		Prompts.makeSearchUsagePrompt(JSON.stringify(codeNodes), query)
+		Prompts.makeWhyUsedPrompt(JSON.stringify(codeNodes), query)
 	)
 	if (!result) return {}
 
@@ -61,10 +61,10 @@ export async function __searchUsage__(
 	return data
 }
 
-export async function searchUsageRoute(req: Request, res: Response) {
+export async function whyUsedRoute(req: Request, res: Response) {
 	const query = req.body.query
 	try {
-		const result = await __searchUsage__(query)
+		const result = await __whyUsed__(query)
 		res.status(200).json(result)
 	} catch (error) {
 		console.log(error)

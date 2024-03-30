@@ -162,10 +162,7 @@ export namespace Prompts {
 		)
 	}
 
-	export function makeSearchUsagePrompt(
-		codebase: string,
-		query: string
-	): string {
+	export function makeWhyUsedPrompt(codebase: string, query: string): string {
 		const prompt = new Prompt(
 			`
             You are an expert in understanding and answering questions of user when given a proper context of the codebase.
