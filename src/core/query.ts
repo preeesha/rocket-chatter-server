@@ -14,7 +14,7 @@ export namespace Query {
 				CALL db.index.vector.queryNodes("${indexName}", 2, $vector)
 				YIELD node, score 
 				WHERE score >= ${threshold}
-				WITH node, score // Include the score here
+				WITH node, score
 				MATCH (node)-[r]->(relatedNode)
 				RETURN node, COLLECT(relatedNode) AS relatedNodes, score
 				ORDER BY score DESC
@@ -43,7 +43,7 @@ export namespace Query {
 			const result = await getDBNodesFromVectorQuery(
 				"nameEmbeddings",
 				queryVector,
-				0.9
+				0.7
 			)
 			results.push(...result)
 		}

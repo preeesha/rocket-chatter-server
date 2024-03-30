@@ -1,4 +1,4 @@
-import { __ask__ } from "./routes/ask"
+import { __importance__ } from "./routes/importance"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,7 +16,7 @@ const USER =             {
 `
 
 async function main() {
-	const result = await __ask__("CRC_TABLE what is this?")
+	const result = await __importance__("FederationSearchPublicRoomsInputDto")
 	// console.clear()
 	console.log(result)
 

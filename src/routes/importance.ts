@@ -1,43 +1,65 @@
 import { Request, Response } from "express"
+import { db } from "../core/neo4j"
 import { Query } from "../core/query"
-import { DBNode, DBNodeRelation } from "../database/node.types"
+import { DBNode } from "../database/node.types"
 
 namespace Algorithms {
-	function relationCount(node: DBNode, relation: DBNodeRelation): number {
-		return 0
-		// const count = node.relations.reduce((acc, rel) => {
-		// 	if (rel.relation === relation) acc++
-		// 	return acc
-		// }, 0)
-		// return count
+	export async function calculateCentrality(node: DBNode): Promise<number> {
+		const maxOutDegreeQuery = await db.run(
+			`
+				MATCH (n)
+				WITH n, [(n)-[]->() | 1] AS outgoingRelationships
+				RETURN size(outgoingRelationships) AS outDegree
+				ORDER BY outDegree DESC
+				LIMIT 1
+			`
+		)
+		const maxOutDegree = maxOutDegreeQuery.records[0]
+			.get("outDegree")
+			.toNumber()
+
+		const outDegree = await db.run(
+			`
+				MATCH (n:Node { id: $id })<-[]-(x) 
+				RETURN count(x) AS outDegree
+			`,
+			{ id: node.id }
+		)
+
+		const centrality = outDegree.records[0].get("outDegree").toNumber()
+
+		const relativeCentrality = centrality / maxOutDegree
+		return relativeCentrality
 	}
 
-	export function calculateFrequencyOfUse(nodes: DBNode[]): number {
-		return 0
-		// const frequency = nodes.reduce((acc, node) => {
-		// 	acc += node.relations.length
-		// 	return acc
-		// }, 0)
-		// return frequency
+	export async function calculateCriticality(node: DBNode): Promise<number> {
+		const maxInDegreeQuery = await db.run(
+			`
+				MATCH (n)
+				WITH n, [(n)<-[]-() | 1] AS incomingRelationships
+				RETURN size(incomingRelationships) AS inDegree
+				ORDER BY inDegree DESC
+				LIMIT 1
+			`
+		)
+		const maxInDegree = maxInDegreeQuery.records[0].get("inDegree").toNumber()
+
+		const inDegree = await db.run(
+			`
+				MATCH (n:Node { id: $id })-[]->(x) 
+				RETURN count(x) AS inDegree
+			`,
+			{ id: node.id }
+		)
+		const criticality = inDegree.records[0].get("inDegree").toNumber()
+
+		const relativeCriticality = criticality / maxInDegree
+		return relativeCriticality
 	}
 
 	export function calculateLinesOfCode(node: DBNode): number {
 		const loc = node.code.split("\n").length
 		return loc
-	}
-
-	export function calculateCentrality(node: DBNode): number {
-		const centrality =
-			relationCount(node, "CALLED_BY") + relationCount(node, "USED_IN")
-		return centrality
-	}
-
-	export function calculateCriticality(node: DBNode): number {
-		return 0
-	}
-
-	export function calculateCyclomaticComplexity(node: DBNode): number {
-		return relationCount(node, "DEPENDS_ON")
 	}
 }
 
@@ -50,8 +72,9 @@ export async function __importance__(
 	 * Extract the possible keywords from the user's query
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	const keywords = await Query.getDBKeywordsFromQuery(query)
-	if (!keywords.length) return null
+	const keywords = [query]
+	// const keywords = await Query.getDBKeywordsFromQuery(query)
+	// if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -61,6 +84,7 @@ export async function __importance__(
 	 */
 	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
 	if (!codeNodes.length) return null
+	const targetNode = codeNodes[0]
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -68,18 +92,12 @@ export async function __importance__(
 	 * Generate the final score based on various factors
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	const frequency = Algorithms.calculateFrequencyOfUse(codeNodes)
-	const loc = Algorithms.calculateLinesOfCode(codeNodes[0])
-	const centrality = Algorithms.calculateCentrality(codeNodes[0])
-	const criticality = Algorithms.calculateCriticality(codeNodes[0])
-	const cyclomaticComplexity = Algorithms.calculateCyclomaticComplexity(
-		codeNodes[0]
-	)
+	const loc = Algorithms.calculateLinesOfCode(targetNode)
+	const centrality = await Algorithms.calculateCentrality(targetNode)
+	const criticality = await Algorithms.calculateCriticality(targetNode)
+	const importance = (centrality + criticality) / 2
 
-	const score =
-		frequency + loc + centrality + criticality + cyclomaticComplexity
-
-	return { result: score }
+	return { loc, centrality, criticality, importance }
 }
 
 export async function importanceRoute(req: Request, res: Response) {
