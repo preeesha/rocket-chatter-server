@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
-import { STYLEGUIDE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { db } from "../core/neo4j"
+import { Prompts } from "../prompts"
 
 export async function __styleguide__(
 	targetEntity: string
@@ -25,10 +25,7 @@ export async function __styleguide__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const result = await LLM.generateOutput(
-		STYLEGUIDE_BASE_PROMPT.replace(
-			"$STYLEGUIDES",
-			JSON.stringify(styleGuides)
-		).replace("$TARGET_ENTITY", targetEntity)
+		Prompts.makeStyleguidePrompt(targetEntity, JSON.stringify(styleGuides))
 	)
 	if (!result) return null
 

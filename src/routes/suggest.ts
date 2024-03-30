@@ -1,9 +1,11 @@
 import { Request, Response } from "express"
-import { REFACTOR_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
+import { Prompts } from "../prompts"
 
-export async function __refactor__(query: string): Promise<string | null> {
+export async function __suggest__(
+	query: string
+): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
@@ -19,8 +21,8 @@ export async function __refactor__(query: string): Promise<string | null> {
 	 * Query the database to find the nodes names of which are similar to what user has requested
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	const results = await Query.getCodeNodesFromKeywords(keywords)
-	if (!results.length) return null
+	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
+	if (!codeNodes.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
@@ -29,18 +31,20 @@ export async function __refactor__(query: string): Promise<string | null> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const answer = await LLM.generateOutput(
-		REFACTOR_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
-		query
+		Prompts.makeSuggestPrompt(JSON.stringify(codeNodes), query)
 	)
 	if (!answer) return null
 
-	return answer
+	return { result: answer }
 }
 
-export async function refactorRoute(req: Request, res: Response) {
+export async function suggestRoute(req: Request, res: Response) {
 	const query = req.body.query
+
 	try {
-		const result = await __refactor__(query)
+		const result = await __suggest__(query)
+		if (!result) return res.status(400).json({ status: "ERROR" })
+
 		res.status(200).json(result)
 	} catch (error) {
 		res.status(500).json({ status: "ERROR" })

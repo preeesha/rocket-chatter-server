@@ -1,38 +1,40 @@
 import { Request, Response } from "express"
-import { writeFileSync } from "fs"
-import { DOCUMENT_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
+import { Prompts } from "../prompts"
 
 export async function __document__(
-	targetEntity: string,
 	query: string
 ): Promise<Record<string, string> | null> {
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 1:
-	 * Query the database to find the nodes names of which are similar to what user has requested
+	 * Extract the possible keywords from the user's query
 	 * ---------------------------------------------------------------------------------------------
 	 */
-	console.log(targetEntity)
-	const codeNodes = await Query.getCodeNodesFromKeywords([targetEntity])
-	if (!codeNodes.length) return null
+	const keywords = await Query.getDBKeywordsFromQuery(query)
+	console.log("KEYWORDS", keywords)
+	if (!keywords.length) return null
 
 	/**
 	 * ---------------------------------------------------------------------------------------------
 	 * STEP 2:
+	 * Query the database to find the nodes names of which are similar to what user has requested
+	 * ---------------------------------------------------------------------------------------------
+	 */
+	const codeNodes = await Query.getCodeNodesFromKeywords(keywords)
+	if (!codeNodes.length) return null
+
+	/**
+	 * ---------------------------------------------------------------------------------------------
+	 * STEP 3:
 	 * Generate the documentation based on the code nodes and user's query
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const result = await LLM.generateOutput(
-		DOCUMENT_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(codeNodes))
-			.replace("$TARGET_ENTITY", targetEntity)
-			.replace("$EXAMPLE_USAGES", "2"),
-		query
+		Prompts.makeDocumentPrompt(JSON.stringify(codeNodes), query)
 	)
 	if (!result) return null
-
-	writeFileSync("document.json", result)
 
 	const data = JSON.parse(result)
 
@@ -41,10 +43,9 @@ export async function __document__(
 
 export async function documentRoute(req: Request, res: Response) {
 	const query = req.body.query
-	const targetEntity = req.body.targetEntity
 
 	try {
-		const result = await __document__(targetEntity, query)
+		const result = await __document__(query)
 		if (!result) return res.status(400).json({ status: "ERROR" })
 
 		res.status(200).json(result)

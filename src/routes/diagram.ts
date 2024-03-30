@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import { DIAGRAM_BASE_PROMPT } from "../constants"
 import { renderDiagramToBase64URI } from "../core/diagram"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
+import { Prompts } from "../prompts"
 
 export async function __diagram__(query: string): Promise<string | null> {
 	/**
@@ -32,8 +32,7 @@ export async function __diagram__(query: string): Promise<string | null> {
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const diagram = await LLM.generateOutput(
-		DIAGRAM_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(results)),
-		query
+		Prompts.makeDiagramPrompt(JSON.stringify(results), query)
 	)
 	console.log("ANSWER:\n", diagram)
 	if (!diagram) return null

@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
-import { TRANSLATE_BASE_PROMPT } from "../constants"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
+import { Prompts } from "../prompts"
 
 export async function __translate__(
 	targetEntity: string,
@@ -23,10 +23,11 @@ export async function __translate__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const result = await LLM.generateOutput(
-		TRANSLATE_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(codeNodes))
-			.replace("$TARGET_ENTITY", targetEntity)
-			.replace("$TARGET_LANGUAGE", targetLanguage),
-		""
+		Prompts.makeTranslatePrompt(
+			JSON.stringify(codeNodes),
+			targetEntity,
+			targetLanguage
+		)
 	)
 	if (!result) return null
 

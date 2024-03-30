@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import { SEARCHUSAGE_BASE_PROMPT } from "../constants"
 import { renderDiagramToBase64URI } from "../core/diagram"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
+import { Prompts } from "../prompts"
 
 export async function __searchUsage__(
 	query: string
@@ -32,8 +32,7 @@ export async function __searchUsage__(
 	 * ---------------------------------------------------------------------------------------------
 	 */
 	const result = await LLM.generateOutput(
-		SEARCHUSAGE_BASE_PROMPT.replace("$CODEBASE", JSON.stringify(codeNodes)),
-		query
+		Prompts.makeSearchUsagePrompt(JSON.stringify(codeNodes), query)
 	)
 	if (!result) return {}
 

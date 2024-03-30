@@ -1,5 +1,5 @@
-import { DB_QUERY_BASE_PROMPT } from "../constants"
 import { DBNode } from "../database/node.types"
+import { Prompts } from "../prompts"
 import { LLM } from "./llm"
 import { db } from "./neo4j"
 
@@ -54,7 +54,9 @@ export namespace Query {
 	export async function getDBKeywordsFromQuery(
 		query: string
 	): Promise<string[]> {
-		const content = await LLM.generateOutput(DB_QUERY_BASE_PROMPT, query)
+		const content = await LLM.generateOutput(
+			Prompts.makeDBKeywordQueryPrompt(query)
+		)
 		if (!content) return []
 
 		const keywords: string[] = JSON.parse(content)
