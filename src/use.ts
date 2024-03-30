@@ -1,4 +1,4 @@
-import { __styleguide__ } from "./routes/styleguide"
+import { __document__ } from "./routes/document"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,7 +16,9 @@ const USER =             {
 `
 
 async function main() {
-	const result = await __styleguide__(CODEBASE)
+	const result = await __document__(
+		"parseInternalKey can you explain me this in a long detailed version?"
+	)
 	// console.clear()
 	console.log(result)
 }

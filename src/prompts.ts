@@ -12,7 +12,10 @@ export namespace Prompts {
 				- Extract the possible keywords from the user's query.
 				- Query the database to find the nodes names of which are similar to what user has requested.
 
-				EXPECTED OUTPUT: Only An array of nodes from the codebase.
+				EXPECTED OUTPUT:
+				<ANSWER>
+					- Provide the possible keywords extracted from the user's query.
+				</ANSWER>
 
 				RULES:
 				- STRICTLY, do not make anything other than the answer to the user's query.
@@ -20,35 +23,29 @@ export namespace Prompts {
 				- Do not provide any kind of diagram or visualization in the output.
 				- The output MUST BE IN ONLY AND ONLY AN ARRAY OF STRINGS.
 			`,
-			"Sure, I will strictly follow my instructions. I will provide the answer in ONLY ARRAY OF STRINGS."
+			"Sure, I will strictly follow my instructions. I will provide the answer the above specified format only."
 		)
 
-		return prompt.make([
-			{
-				role: "system",
-				content: "You must output only in the form of an array of strings.",
-			},
-			{
-				role: "assistant",
-				content:
-					"Sure, I will strictly follow my instructions. I will provide the answer in ONLY ARRAY OF STRINGS.",
-			},
-			{
-				role: "system",
-				content: `
+		return prompt.make(
+			[
+				{
+					role: "system",
+					content: `
 					Here's the user query:
 					<QUERY_START>
 						${query}
 					<QUERY_END>
 				`,
-			},
-			{
-				role: "assistant",
-				content:
-					"Yeah sure. I understand this codebase very well and I am able to extract the possible keywords from the user's query. If I can't find the keywords, I'll return an empty array.",
-			},
-			{ role: "user", content: query },
-		])
+				},
+				{
+					role: "assistant",
+					content:
+						"Yeah sure. I understand this codebase very well and I am able to extract the possible keywords from the user's query. If I can't find the keywords, I'll return an empty array.",
+				},
+				{ role: "user", content: query },
+			],
+			`<ANSWER>["`
+		)
 	}
 
 	export function makeAskPrompt(codebase: string, query: string): string {

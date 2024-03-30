@@ -59,7 +59,9 @@ export namespace Query {
 		)
 		if (!content) return []
 
-		const keywords: string[] = JSON.parse(content)
+		const array = content.split("<ANSWER>")[1].split("</ANSWER>")[0]
+
+		const keywords: string[] = JSON.parse(array)
 		return keywords
 	}
 }
