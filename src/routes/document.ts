@@ -36,9 +36,18 @@ export async function __document__(
 	)
 	if (!result) return null
 
-	const data = JSON.parse(result)
+	const answer = result
+		.split("<ANSWER_START>")[1]
+		.split("<ANSWER_END>")[0]
+		.trim()
 
-	return { jsDoc: data[0], explanation: data[1] }
+	const jsDoc = answer.split("<JSDOC>")[1].split("</JSDOC>")[0].trim()
+	const explanation = answer
+		.split("<EXPLANATION>")[1]
+		.split("</EXPLANATION>")[0]
+		.trim()
+
+	return { jsDoc: jsDoc, explanation: explanation }
 }
 
 export async function documentRoute(req: Request, res: Response) {

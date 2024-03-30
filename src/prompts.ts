@@ -122,43 +122,47 @@ export namespace Prompts {
 
             INPUT: Inter-related entities from a huge codebase in JSON format, target entity to generate documentation for & number of example usages to provide.
 
-            TASKS:
-               In the 0th value of array of the final output:
-               - Generate a short JSDoc documentation for the target entity explaining its purpose and usage.
-               - Generate a comprehensive JSDoc documentation for the target entity explaining its purpose, usage, and parameters in @description, @param, @returns, @throws sections respectively.
-               - (IF EXISTS) Explain the edge cases and exceptions the target entity might throw or face in the @throws section.
-               - (ONLY IF POSSIBLE & RELEVANT) Provide different example usages of the target entity in the codebase.
-
-               In the 1st value of array of the final output:
-               - Provide an additional comprehensive explanation of the target entity with proper reasoning.
-
-            EXPECTED OUTPUT: A single 1D array containing 2 strings. 0th value is the JSDoc documentation and 1st value is the additional explanation. It must be a valid JSON.
+            EXPECTED OUTPUT:
+				<ANSWER_START>
+					<JSDOC>
+						- Generate a short JSDoc documentation for the target entity explaining its purpose and usage.
+						- Generate a comprehensive JSDoc documentation for the target entity explaining its purpose, usage, and parameters in @description, @param, @returns, @throws sections respectively.
+						- (IF EXISTS) Explain the edge cases and exceptions the target entity might throw or face in the @throws section.
+						- (ONLY IF POSSIBLE & RELEVANT) Provide different example usages of the target entity in the codebase.
+					</JSDOC>
+					<EXPLANATION>
+						- Provide an additional comprehensive explanation of the target entity with proper reasoning.
+					</EXPLANATION>
+				<ANSWER_END>
 
             RULES:
             - STRICTLY, do not make anything other than the answer to the user's query.
             - DON'T REPEAT THE EXAMPLES.
             - Do not provide any kind of diagram or visualization in the output.
          `,
-			"Sure, I will strictly follow my instructions. I will only provide the answer an array of strings which will be a valid JSON."
+			"Sure, I will strictly follow my instructions. The output will be in the above format only."
 		)
 
-		return prompt.make([
-			{
-				role: "system",
-				content: `
+		return prompt.make(
+			[
+				{
+					role: "system",
+					content: `
                HERE'RE THE NODES OF THE CODEBASE TO USE AS CONTEXT:
                <CODEBASE_START>
                   ${codebase}
                </CODEBASE_END>
             `,
-			},
-			{
-				role: "assistant",
-				content:
-					"Yeah sure. I understand this codebase very well and I am able to generate JSDoc documentation for the target entity. If I don't know the answer, I'll return an empty array.",
-			},
-			{ role: "user", content: query },
-		])
+				},
+				{
+					role: "assistant",
+					content:
+						"Yeah sure. I understand this codebase very well and I am able to generate JSDoc & documentation for the target entity.",
+				},
+				{ role: "user", content: query },
+			],
+			'<ANSWER_START>\n["'
+		)
 	}
 
 	export function makeSearchUsagePrompt(
