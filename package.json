@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "nodemon src/main.ts"
+    "start": "nodemon src/main.ts",
+    "user": "ts-node src/use.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.27",
