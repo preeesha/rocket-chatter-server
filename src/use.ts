@@ -1,4 +1,4 @@
-import { __document__ } from "./routes/document"
+import { __searchUsage__ } from "./routes/searchUsage"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,11 +16,13 @@ const USER =             {
 `
 
 async function main() {
-	const result = await __document__(
-		"parseInternalKey can you explain me this in a long detailed version?"
-	)
+	const result = await __searchUsage__("copydb")
 	// console.clear()
 	console.log(result)
+
+	// const result = readFileSync("output.txt", "utf-8")
+	// const answer = result.split("<IMPACT>")[1].split("</IMPACT>")[0].trim()
+	// console.log(answer)
 }
 
 main()
