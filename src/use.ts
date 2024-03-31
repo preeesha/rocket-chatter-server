@@ -1,4 +1,4 @@
-import { __importance__ } from "./routes/importance"
+import { __diagram__ } from "./routes/diagram"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,7 +16,7 @@ const USER =             {
 `
 
 async function main() {
-	const result = await __importance__("FederationSearchPublicRoomsInputDto")
+	const result = await __diagram__("BloomFilter")
 	// console.clear()
 	console.log(result)
 

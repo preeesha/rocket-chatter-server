@@ -36,9 +36,11 @@ export async function __diagram__(query: string): Promise<string | null> {
 	)
 	if (!diagram) return null
 
-	console.log(diagram);
+	console.log(diagram)
 
 	const diagramContent = diagram
+		.replace("```mermaid", "")
+		.replace("```", "")
 		.split("<DIAGRAM_START>")[1]
 		.split("<DIAGRAM_END>")[0]
 		.trim()

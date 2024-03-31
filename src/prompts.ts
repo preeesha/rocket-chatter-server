@@ -93,10 +93,15 @@ export namespace Prompts {
 		const prompt = new Prompt(
 			`
             You are an expert in understanding and answering questions of user when given a proper context of the codebase. Here're the rules:
-            1. You only provide diagram or visualization in the Graphviz format.
-				2. The output must be a valid PLAIN TEXT only.
+				
+				EXPECTED OUTPUT:
+				<ANSWER>
+					- You only provide flowchart or sequence diagram in the mermaid 8.9.0 format.
+					- The diagram must be clear and understandable for the user. The aim is to make it easy for the user to understand the flow & overall working.
+					- The output must not have any kind of errors and must render properly.
+				</ANSWER>
          `,
-			"Sure, I will strictly follow my instructions. I will provide the answer in a valid PLAIN TEXT only. Don't expalin anything."
+			"Sure, I will strictly follow my instructions. I will provide the answer in a valid PLAIN TEXT only. I won't expalin anything."
 		)
 
 		return prompt.make(
@@ -113,11 +118,11 @@ export namespace Prompts {
 				{
 					role: "assistant",
 					content:
-						"Yeah sure. I'll start my response with <DIAGRAM_START> and end with <DIAGRAM_END>. I will only provide the answer in a valid PLAIN TEXT only. Don't expalin anything.",
+						"Yeah sure. I'll start my response with <DIAGRAM_START> and end with <DIAGRAM_END>.",
 				},
 				{ role: "user", content: query },
 			],
-			"<DIAGRAM_START>"
+			"<DIAGRAM_START>```mermaid"
 		)
 	}
 
