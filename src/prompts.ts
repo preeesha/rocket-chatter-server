@@ -194,9 +194,10 @@ export namespace Prompts {
 						- Provide the impact score of the target entity based on the number of usages and the importance of the file.
 					</IMPACT>
 					<DIAGRAM>
-						- Provide a clear and consize graphviz diagram showing the direct usages of that entity in the codebase. Make it as simple as possible but don't miss any important information.
-						- Without saying anything, provide the diagram. Don't include the symbol \`\`\` anywhere in the diagram.
-						</DIAGRAM>
+						- You only provide flowchart or sequence diagram in the mermaid 8.9.0 format.
+						- The diagram must be clear and understandable for the user. The aim is to make it easy for the user to understand the flow & overall working.
+						- The output must not have any kind of errors and must render properly.
+					</DIAGRAM>
 				</ANSWER>
 						
 				RULES:

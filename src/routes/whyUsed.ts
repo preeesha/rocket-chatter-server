@@ -1,4 +1,5 @@
 import { Request, Response } from "express"
+import { writeFileSync } from "fs"
 import { renderDiagramToBase64URI } from "../core/diagram"
 import { LLM } from "../core/llm"
 import { Query } from "../core/query"
@@ -53,8 +54,13 @@ export async function __whyUsed__(
 	if (!diagram) return { impact, explanation, diagram: "" }
 
 	if (diagram) {
+		const parsedDiagram = diagram
+			.replace("```mermaid", "")
+			.replace("```", "")
+			.trim()
+		writeFileSync("output.txt", parsedDiagram)
 		try {
-			data.diagram = await renderDiagramToBase64URI(diagram)
+			data.diagram = await renderDiagramToBase64URI(parsedDiagram)
 		} catch {}
 	}
 
