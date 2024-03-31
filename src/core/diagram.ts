@@ -21,7 +21,7 @@ export async function renderDiagramToBase64URI(
 		)
 
 		diagram.on("exit", async (code) => {
-			unlinkSync(diagramSourceFileName)
+//			unlinkSync(diagramSourceFileName)
 			if (code === 0) {
 				resolve()
 			} else {

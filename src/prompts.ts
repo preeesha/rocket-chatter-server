@@ -96,12 +96,13 @@ export namespace Prompts {
 				
 				EXPECTED OUTPUT:
 				<ANSWER>
-					- You only provide flowchart or sequence diagram in the mermaid 8.9.0 format.
-					- The diagram must be clear and understandable for the user. The aim is to make it easy for the user to understand the flow & overall working.
+					- You provide graph diagrams in the mermaid 8.9.0 format.
+					- The diagram must be clear and understandable for the user.
+					- The aim is to make it easy for the user to understand the flow & overall working.
 					- The output must not have any kind of errors and must render properly.
 				</ANSWER>
          `,
-			"Sure, I will strictly follow my instructions. I will provide the answer in a valid PLAIN TEXT only. I won't expalin anything."
+			"Sure, I will strictly follow my instructions. I will provide the answer in a valid PLAIN TEXT only. I won't use parentheses at all even if they are required."
 		)
 
 		return prompt.make(
@@ -122,7 +123,7 @@ export namespace Prompts {
 				},
 				{ role: "user", content: query },
 			],
-			"<DIAGRAM_START>```mermaid"
+			"<DIAGRAM_START>```mermaid\ngraph TD"
 		)
 	}
 
