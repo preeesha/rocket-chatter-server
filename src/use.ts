@@ -1,4 +1,4 @@
-import { __whyUsed__ } from "./routes/whyUsed"
+import { __diagram__ } from "./routes/diagram"
 
 const SYSTEM_PROMPT = `You are a professional python programmer. Even if user asks you anything other than python, deny it very gracefully.`
 const ASSISTANT_PROMPT = `Yeah sure, I won't answer anything other than python.`
@@ -16,7 +16,7 @@ const USER =             {
 `
 
 async function main() {
-	const result = await __whyUsed__("copydb")
+	const result = await __diagram__("copydb")
 	// console.clear()
 	console.log(result)
 

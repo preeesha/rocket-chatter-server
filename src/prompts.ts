@@ -92,12 +92,12 @@ export namespace Prompts {
 	export function makeDiagramPrompt(codebase: string, query: string): string {
 		const prompt = new Prompt(
 			`
-            You are an expert in understanding and answering questions of user when given a proper context of the codebase. Here're the rules:
+            You are an expert in understanding and answering questions of user when given a proper context of the codebase.
+				You provide mermaid 8.9.0 based graph and sequence diagrams which enhance the user's understanding of the codebase. These diagrams has a special quality that they are never off the mark and always render properly. The diagram are never other than the information provided in the codebase.
 				
 				EXPECTED OUTPUT:
 				<ANSWER>
-					- You provide graph diagrams in the mermaid 8.9.0 format.
-					- The diagram must be clear and understandable for the user.
+					- You provide mermaid 8.9.0 based graph and sequence diagrams only.
 					- The aim is to make it easy for the user to understand the flow & overall working.
 					- The output must not have any kind of errors and must render properly.
 				</ANSWER>
@@ -123,7 +123,7 @@ export namespace Prompts {
 				},
 				{ role: "user", content: query },
 			],
-			"<DIAGRAM_START>```mermaid\ngraph TD"
+			"<DIAGRAM_START>```mermaid\n"
 		)
 	}
 
